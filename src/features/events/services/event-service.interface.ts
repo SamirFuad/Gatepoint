@@ -63,7 +63,23 @@ export type CreateEventData = {
 /**
  * Data for updating an event.
  */
-export type UpdateEventData = Partial<CreateEventData> & {
+export type UpdateEventData = Partial<
+  Omit<
+    CreateEventData,
+    | 'description'
+    | 'venueName'
+    | 'venueAddress'
+    | 'registrationOpensAt'
+    | 'registrationClosesAt'
+    | 'maxAttendees'
+  >
+> & {
+  description?: string | null;
+  venueName?: string | null;
+  venueAddress?: string | null;
+  registrationOpensAt?: string | null;
+  registrationClosesAt?: string | null;
+  maxAttendees?: number | null;
   status?: EventStatus;
   isPublished?: boolean;
   landingPageConfig?: Record<string, unknown>;
