@@ -1,0 +1,2 @@
+EXT_PUBLIC_SUPABASE_URL= https://jqwlnnimuzgabraheeac.supabase.co/rest/v1/
+NEXT_PUBLIC_SUPABASE_ANON_KEY= sb_publishable_rV-wPRD6XsK-IPR0EnW2mQ_SB7KRQJB
