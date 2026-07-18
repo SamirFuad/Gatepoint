@@ -4,9 +4,9 @@ Last checked: 2026-07-18
 
 ## Current Position
 
-Current implementation step: **Step 15 of 17 - Deployment**
+Current implementation step: **Step 16 of 17 - Testing**
 
-The project has now completed the core setup/design-system work, repository support for the Supabase schema, typed Supabase clients, authentication code path, organization management code path, dashboard shell, event management code path, landing page code path, registration form builder, public registration flow, attendee management, QR code generation, email integration, and organizer dashboard. The next sequential implementation task is Step 15: deployment.
+The project has now completed the core setup/design-system work, repository support for the Supabase schema, typed Supabase clients, authentication code path, organization management code path, dashboard shell, event management code path, landing page code path, registration form builder, public registration flow, attendee management, QR code generation, email integration, organizer dashboard, and deployment readiness. The next sequential implementation task is Step 16: testing.
 
 ## Step Status
 
@@ -26,26 +26,27 @@ The project has now completed the core setup/design-system work, repository supp
 | 12 | QR Code Generation | Implemented in repo | Added QR code service interface/implementation, QR generation action, QR data URL generation with `qrcode`, QR record storage, QR code management page, and event detail navigation. |
 | 13 | Email Integration | Implemented in repo | Added Resend email service, registration confirmation template, QR delivery template, graceful no-key skip behavior, and email triggers after public registration and QR generation. |
 | 14 | Organizer Dashboard | Implemented in repo | Added dashboard aggregation service with event/registration/QR stats, upcoming event overview cards, recent registration activity, and replaced the placeholder dashboard route. |
-| 15 | Deployment | Current step / not started | No Vercel/Supabase production deployment configuration beyond default Next config found. |
-| 16 | Testing | Not started | No Vitest/Playwright configs or test folders found. |
+| 15 | Deployment | Implemented in repo | Added `vercel.json`, `railway.json`, standalone Next output, `/health`, production security headers in `next.config.ts`, `scripts/verify-env.mjs`, `npm run deploy:check`, and `docs/deployment.md`; deployment check passes. |
+| 16 | Testing | Current step / not started | No Vitest/Playwright configs or test folders found. |
 | 17 | Documentation | Not started | README is still the default Next.js README; architecture/deployment/API docs are not present. |
 
 ## Summary
 
-Sequential progress is best counted as **14 of 17 steps substantially complete**.
+Sequential progress is best counted as **15 of 17 steps substantially complete**.
 
-The next implementation task should be **Step 15: Deployment**, including:
+The next implementation task should be **Step 16: Testing**, including:
 
-- Verify production environment variables for Supabase, Resend, and the app URL.
-- Add deployment-ready configuration and documentation for Vercel.
-- Confirm hosted Supabase redirect URLs and production domain values.
-- Run a production build before deployment.
+- Add unit test tooling for focused service/schema coverage.
+- Add integration tests for critical server actions where feasible.
+- Add E2E coverage for registration and organizer flows.
+- Add security-oriented regression checks for protected routes and RLS assumptions.
 
 ## Latest Verification
 
 - `npm.cmd run type-check` passes.
 - `npm.cmd run lint` passes.
 - `npm.cmd run build` passes.
+- `npm.cmd run deploy:check` passes.
 - Hosted Supabase schema migration applied successfully through the IPv4 pooler.
 - Hosted Supabase schema verification found 9 public tables, 35 RLS policies, and the key helper functions.
 
@@ -57,6 +58,9 @@ The next implementation task should be **Step 15: Deployment**, including:
 - Supabase CLI is not installed in this environment, so the hosted migration was applied with a temporary local PostgreSQL client through the Supabase IPv4 pooler.
 - A local ignored `.env.local` was created from `rkey.md` with the Supabase anon settings.
 - The app no longer uses `next/font/google` in the root layout because offline builds failed while fetching Google Fonts. It now uses a system font stack configured in CSS.
-- Authentication, organization, event management, landing page, registration form, registration, attendee, QR code generation, email integration, and organizer dashboard code compile and build with the hosted schema now applied. Live end-to-end browser testing is still pending.
+- Authentication, organization, event management, landing page, registration form, registration, attendee, QR code generation, email integration, organizer dashboard, and Vercel/Railway deployment readiness code compile and build with the hosted schema now applied. Live end-to-end browser testing is still pending.
 - Email sending will skip gracefully when `RESEND_API_KEY` is not configured; set `RESEND_FROM_EMAIL` to a verified sender before production sends.
+- Local deployment checks read `.env.local` and verify required variables without printing secret values.
+- `SUPABASE_SERVICE_ROLE_KEY` is optional for the current code path and was not present during the latest local deployment check.
+- Railway deployment is configured through `railway.json` with Railpack, standalone Next server startup, `/health` healthchecks, and an on-failure restart policy.
 - Public landing pages are available at `/public/events/[slug]` to avoid conflicting with protected dashboard event routes.
