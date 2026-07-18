@@ -1,0 +1,470 @@
+# Gatepoint Phase 1 — Implementation Plan
+
+## Overview
+
+**Gatepoint** is a cloud-based Event Registration Platform built as a multi-tenant SaaS product. Phase 1 delivers a production-ready MVP with authentication, organization management, event creation, public landing pages, registration forms, attendee management, QR code generation, and email delivery.
+
+This plan covers the full architecture and all 17 implementation steps. We will execute them **one at a time**, waiting for your approval between each step.
+
+---
+
+## Architecture Decisions
+
+### Why Clean Architecture with Service Layer (Not Direct Supabase Calls)
+
+| Approach | Pros | Cons |
+|:---|:---|:---|
+| **Direct Supabase calls in components** | Fast to build | Vendor lock-in; impossible to test; unmaintainable |
+| **Service Layer (chosen)** | Decoupled; testable; migratable | Slightly more initial code |
+| **Full Clean Architecture (4 layers)** | Maximum separation | Over-engineered for Phase 1 |
+
+**Decision**: We use a **pragmatic service layer** — TypeScript interfaces define contracts, Supabase implementations fulfill them, and the UI only talks to services. This gives us 90% of Clean Architecture's benefits without the boilerplate of use-case classes for every operation.
+
+> [!IMPORTANT]
+> This means if you later replace Supabase with NestJS or ASP.NET Core, you only rewrite the service implementations. The UI, types, hooks, and business logic remain untouched.
+
+### Multi-Tenancy Strategy
+
+We use **shared database with `organization_id` column** on all tenant-scoped tables, enforced by:
+1. **RLS policies** — database-level isolation (primary defense)
+2. **Service-layer checks** — application-level validation (defense in depth)
+3. **JWT custom claims** — `org_id` injected via Supabase Auth Hook for fast RLS lookups
+
+### RBAC Strategy
+
+Roles are stored in an `organization_members` table with the following Phase 1 roles:
+
+| Role | Scope | Phase 1 |
+|:---|:---|:---|
+| `owner` | Full org control, billing, delete org | ✅ |
+| `admin` | Manage events, users, settings | ✅ |
+| `organizer` | Create/manage assigned events | ✅ |
+| `staff` | Check-in, on-site operations | 🔮 Future |
+| `platform_admin` | Cross-tenant platform management | 🔮 Future |
+
+---
+
+## Tech Stack Versions
+
+| Technology | Version | Purpose |
+|:---|:---|:---|
+| Next.js | 15.x (App Router) | Frontend framework |
+| React | 19.x | UI library |
+| TypeScript | 5.x (`strict: true`) | Type safety |
+| Tailwind CSS | 4.x | Styling |
+| shadcn/ui | Latest | Component library |
+| Supabase | Latest | Backend (Auth, DB, Storage) |
+| React Hook Form | 7.x | Form management |
+| Zod | 3.x | Schema validation |
+| TanStack Query | 5.x | Server state management |
+| Resend | Latest | Transactional email |
+| Vitest | Latest | Unit/integration testing |
+| Playwright | Latest | E2E testing |
+
+---
+
+## Folder Structure
+
+```
+gatepoint/
+├── src/
+│   ├── app/                          # Next.js App Router
+│   │   ├── (auth)/                   # Auth route group (login, register, etc.)
+│   │   │   ├── login/
+│   │   │   ├── register/
+│   │   │   ├── forgot-password/
+│   │   │   ├── reset-password/
+│   │   │   └── verify-email/
+│   │   ├── (dashboard)/              # Protected dashboard route group
+│   │   │   ├── dashboard/
+│   │   │   ├── events/
+│   │   │   │   ├── [eventId]/
+│   │   │   │   │   ├── attendees/
+│   │   │   │   │   ├── registrations/
+│   │   │   │   │   ├── settings/
+│   │   │   │   │   └── landing-page/
+│   │   │   │   └── new/
+│   │   │   ├── organization/
+│   │   │   │   ├── settings/
+│   │   │   │   └── members/
+│   │   │   └── layout.tsx            # Dashboard shell (sidebar, topbar)
+│   │   ├── (public)/                 # Public route group
+│   │   │   └── events/
+│   │   │       └── [slug]/           # Public event landing page
+│   │   │           └── register/     # Public registration form
+│   │   ├── api/                      # API route handlers
+│   │   │   ├── auth/
+│   │   │   ├── webhooks/
+│   │   │   └── qr/
+│   │   ├── layout.tsx                # Root layout
+│   │   └── page.tsx                  # Marketing home / redirect
+│   │
+│   ├── features/                     # Feature modules
+│   │   ├── auth/
+│   │   │   ├── components/           # Auth-specific UI components
+│   │   │   ├── hooks/                # useAuth, useSession
+│   │   │   ├── services/             # AuthService interface + Supabase impl
+│   │   │   ├── types/                # Auth types
+│   │   │   └── schemas/              # Zod validation schemas
+│   │   ├── organizations/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── services/
+│   │   │   ├── types/
+│   │   │   └── schemas/
+│   │   ├── events/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── services/
+│   │   │   ├── types/
+│   │   │   └── schemas/
+│   │   ├── registrations/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── services/
+│   │   │   ├── types/
+│   │   │   └── schemas/
+│   │   ├── attendees/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── services/
+│   │   │   ├── types/
+│   │   │   └── schemas/
+│   │   ├── qr-codes/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── services/
+│   │   │   ├── types/
+│   │   │   └── schemas/
+│   │   ├── landing-pages/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── services/
+│   │   │   ├── types/
+│   │   │   └── schemas/
+│   │   └── email/
+│   │       ├── services/
+│   │       ├── templates/
+│   │       └── types/
+│   │
+│   ├── components/                   # Shared UI components
+│   │   ├── ui/                       # shadcn/ui components
+│   │   ├── layout/                   # Shell, Sidebar, Topbar, etc.
+│   │   ├── forms/                    # Shared form components
+│   │   └── common/                   # DataTable, EmptyState, LoadingState, etc.
+│   │
+│   ├── lib/                          # Shared infrastructure
+│   │   ├── supabase/
+│   │   │   ├── client.ts             # Browser Supabase client
+│   │   │   ├── server.ts             # Server Supabase client
+│   │   │   ├── middleware.ts          # Auth middleware helper
+│   │   │   └── admin.ts              # Service-role client (server only)
+│   │   ├── resend/
+│   │   │   └── client.ts
+│   │   ├── constants.ts
+│   │   └── utils.ts
+│   │
+│   ├── hooks/                        # Global shared hooks
+│   │   ├── use-debounce.ts
+│   │   └── use-media-query.ts
+│   │
+│   ├── types/                        # Global shared types
+│   │   ├── database.types.ts         # Supabase generated types
+│   │   └── index.ts
+│   │
+│   ├── styles/                       # Global styles
+│   │   └── globals.css
+│   │
+│   └── middleware.ts                 # Next.js middleware (auth guard)
+│
+├── supabase/                         # Supabase project config
+│   ├── migrations/                   # SQL migration files
+│   ├── seed.sql                      # Seed data
+│   └── config.toml
+│
+├── tests/                            # Test files
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+│
+├── public/                           # Static assets
+├── .env.local                        # Local environment variables
+├── .env.example                      # Template for env vars
+├── next.config.ts
+├── tailwind.config.ts
+├── tsconfig.json
+├── vitest.config.ts
+├── playwright.config.ts
+├── eslint.config.mjs
+├── prettier.config.mjs
+└── package.json
+```
+
+---
+
+## Database Schema (Complete Phase 1)
+
+> [!NOTE]
+> The schema includes placeholder columns and reserved table names (commented) for future phases. This ensures future modules integrate without redesign.
+
+### Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    PROFILES ||--o{ ORGANIZATION_MEMBERS : "belongs to"
+    ORGANIZATIONS ||--o{ ORGANIZATION_MEMBERS : "has"
+    ORGANIZATIONS ||--o{ EVENTS : "owns"
+    EVENTS ||--o{ REGISTRATION_FORMS : "has"
+    EVENTS ||--o{ REGISTRATIONS : "receives"
+    REGISTRATION_FORMS ||--o{ FORM_FIELDS : "contains"
+    REGISTRATIONS ||--o{ REGISTRATION_RESPONSES : "has"
+    REGISTRATIONS ||--|| QR_CODES : "generates"
+    FORM_FIELDS ||--o{ REGISTRATION_RESPONSES : "answers"
+
+    PROFILES {
+        uuid id PK
+        text full_name
+        text avatar_url
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    ORGANIZATIONS {
+        uuid id PK
+        text name
+        text slug UK
+        text description
+        text logo_url
+        text website
+        jsonb settings
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    ORGANIZATION_MEMBERS {
+        uuid id PK
+        uuid organization_id FK
+        uuid user_id FK
+        text role
+        timestamptz joined_at
+        timestamptz updated_at
+    }
+
+    EVENTS {
+        uuid id PK
+        uuid organization_id FK
+        uuid created_by FK
+        text title
+        text slug UK
+        text description
+        text event_type
+        text status
+        text venue_name
+        text venue_address
+        text timezone
+        timestamptz starts_at
+        timestamptz ends_at
+        timestamptz registration_opens_at
+        timestamptz registration_closes_at
+        integer max_attendees
+        jsonb settings
+        jsonb landing_page_config
+        boolean is_published
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    REGISTRATION_FORMS {
+        uuid id PK
+        uuid event_id FK
+        uuid organization_id FK
+        text title
+        text description
+        boolean is_active
+        jsonb settings
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    FORM_FIELDS {
+        uuid id PK
+        uuid form_id FK
+        text field_type
+        text label
+        text placeholder
+        boolean is_required
+        jsonb options
+        jsonb validation_rules
+        integer sort_order
+        timestamptz created_at
+    }
+
+    REGISTRATIONS {
+        uuid id PK
+        uuid event_id FK
+        uuid organization_id FK
+        uuid form_id FK
+        text confirmation_number UK
+        text email
+        text full_name
+        text status
+        jsonb metadata
+        timestamptz registered_at
+        timestamptz cancelled_at
+        timestamptz checked_in_at
+    }
+
+    REGISTRATION_RESPONSES {
+        uuid id PK
+        uuid registration_id FK
+        uuid field_id FK
+        text value
+    }
+
+    QR_CODES {
+        uuid id PK
+        uuid registration_id FK
+        uuid event_id FK
+        uuid organization_id FK
+        text code UK
+        text qr_image_url
+        boolean is_used
+        timestamptz used_at
+        timestamptz created_at
+    }
+```
+
+### Key Design Decisions
+
+| Decision | Rationale |
+|:---|:---|
+| `organization_id` on every tenant table | Enables RLS tenant isolation without joins |
+| `slug` on organizations and events | Human-readable URLs (`/events/tech-conf-2026`) |
+| `jsonb settings` columns | Extensible without schema changes for future config |
+| `jsonb landing_page_config` | Stores landing page layout/content as structured JSON |
+| `confirmation_number` on registrations | Public-facing identifier (not UUID) |
+| Separate `form_fields` table | Dynamic form builder support |
+| `registration_responses` linking to `form_fields` | EAV pattern for dynamic form answers |
+| `checked_in_at` on registrations | Future QR check-in without schema change |
+
+---
+
+## Security Architecture
+
+### Defense Layers
+
+```mermaid
+flowchart TD
+    A["Client Request"] --> B["Next.js Middleware"]
+    B --> C["Auth Check (JWT)"]
+    C --> D["Server Action / API Route"]
+    D --> E["Service Layer (Authorization)"]
+    E --> F["Supabase Client (with user JWT)"]
+    F --> G["PostgreSQL + RLS Policies"]
+    G --> H["Data Response"]
+
+    style G fill:#dc2626,color:#fff
+    style E fill:#ea580c,color:#fff
+    style C fill:#ca8a04,color:#fff
+```
+
+### RLS Policy Summary
+
+| Table | SELECT | INSERT | UPDATE | DELETE |
+|:---|:---|:---|:---|:---|
+| `profiles` | Own profile | Own profile | Own profile | ❌ |
+| `organizations` | Members only | Authenticated | Owner/Admin | Owner only |
+| `organization_members` | Same org members | Owner/Admin | Owner/Admin | Owner/Admin |
+| `events` | Org members (+ public if published) | Organizer+ | Organizer+ | Admin+ |
+| `registration_forms` | Org members (+ public if active) | Organizer+ | Organizer+ | Admin+ |
+| `form_fields` | Via form access | Organizer+ | Organizer+ | Organizer+ |
+| `registrations` | Org members | Public (register) | Org members | Admin+ |
+| `registration_responses` | Via registration access | With registration | ❌ | Admin+ |
+| `qr_codes` | Org members | System only | System only | Admin+ |
+
+---
+
+## Implementation Order (17 Steps)
+
+Each step follows: **Design → Explain → Implement → Test → Review → Refactor → STOP**
+
+| Step | Feature | Key Deliverables |
+|:---|:---|:---|
+| 1 | **Project Setup & Architecture** | Next.js project, folder structure, ESLint, Prettier, Tailwind, shadcn/ui, env vars |
+| 2 | **Folder Structure & Design System** | Feature modules, shared components, layout shell, theme configuration |
+| 3 | **Database Schema** | All migration files, RLS policies, indexes, seed data |
+| 4 | **Supabase Configuration** | Client setup (browser/server/admin), middleware helper, generated types |
+| 5 | **Authentication** | Register, login, logout, password reset, email verification, protected routes |
+| 6 | **Organizations** | Create org, org settings, member management, role assignment |
+| 7 | **Dashboard Layout** | Sidebar, topbar, org switcher, responsive shell, navigation |
+| 8 | **Event Management** | CRUD events, event status workflow, event settings |
+| 9 | **Landing Pages** | Landing page builder (JSON config), public event pages, SEO |
+| 10 | **Registration Forms** | Form builder, dynamic fields, field validation, form preview |
+| 11 | **Registrations** | Public registration flow, confirmation numbers, status management |
+| 12 | **QR Code Generation** | QR generation per registration, storage, download |
+| 13 | **Email Integration** | Resend setup, registration confirmation email, QR delivery email |
+| 14 | **Organizer Dashboard** | Dashboard stats, recent activity, event overview cards |
+| 15 | **Deployment** | Vercel config, Supabase production setup, env management |
+| 16 | **Testing** | Unit tests, integration tests, E2E tests, security tests |
+| 17 | **Documentation** | README, API docs, deployment guide, architecture docs |
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> ### Tailwind CSS Version
+> Your spec says Tailwind CSS. The latest is **Tailwind CSS v4** (released 2025), which has a new CSS-first configuration approach (no `tailwind.config.ts`). However, **shadcn/ui currently works best with Tailwind v4** via their updated CLI.
+> 
+> **Recommendation**: Use **Tailwind CSS v4** with shadcn/ui's latest setup. This is the most future-proof choice.
+
+> [!IMPORTANT]
+> ### Supabase Setup
+> You will need a Supabase project created before Step 3. You can use:
+> - **Supabase Cloud** (recommended for production) — free tier available
+> - **Supabase CLI local dev** — for local development with `supabase start`
+> 
+> I recommend using **both**: Supabase CLI for local development and Supabase Cloud for staging/production. Do you already have a Supabase project, or should I guide you through creating one?
+
+> [!IMPORTANT]
+> ### Resend Setup
+> You'll need a Resend API key and a verified sending domain for Step 13. This can wait until we reach that step.
+
+## Open Questions
+
+1. **Do you already have a Supabase project created?** If not, I'll guide you through setup when we reach Step 3.
+
+2. **Do you have a domain name for Gatepoint?** This affects:
+   - Supabase auth redirect URLs
+   - Resend email sending domain
+   - Vercel deployment configuration
+   
+   (If not, we can use Vercel's default `.vercel.app` domain initially)
+
+3. **Do you want the marketing homepage** (at `/`) or should it redirect straight to `/login`? For a SaaS product, a simple marketing landing page adds credibility, but we can skip it for Phase 1 if you prefer.
+
+4. **Organization creation flow**: Should new users be forced to create an organization immediately after registration, or should they land on a "Create Organization" page they can access anytime?
+
+   **My recommendation**: Force org creation after first login (like Vercel, Linear, Notion). This simplifies the entire app since every authenticated action requires an organization context.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- `npm run test` — Vitest unit + integration tests
+- `npm run test:e2e` — Playwright end-to-end tests
+- `npm run lint` — ESLint checks
+- `npm run type-check` — TypeScript strict mode validation
+
+### Manual Verification
+- Full registration → login → create org → create event → publish → register as attendee → receive QR email flow
+- RLS policy verification: ensure cross-tenant data isolation
+- Mobile responsiveness across breakpoints
+- Auth edge cases: expired tokens, invalid sessions, password reset flow
+
+---
+
+## Next Step
+
+Upon your approval, I will begin with **Step 1: Project Setup & Architecture** — initializing the Next.js project with all tooling configured.
