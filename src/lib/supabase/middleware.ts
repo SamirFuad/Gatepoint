@@ -7,6 +7,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import type { Database } from '@/types/database.types';
 
 /**
  * Updates the Supabase auth session by refreshing the token
@@ -31,7 +32,7 @@ export async function updateSession(request: NextRequest) {
     return { supabaseResponse, user: null };
   }
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     supabaseUrl,
     supabaseAnonKey,
     {

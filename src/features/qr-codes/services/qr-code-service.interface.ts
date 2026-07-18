@@ -5,5 +5,5 @@
 // =============================================================
 
 export interface IQRCodeService {
-  // To be defined in Step 12
+  readonly __placeholder?: never;
 }

@@ -5,5 +5,5 @@
 // =============================================================
 
 export interface ILandingPageService {
-  // To be defined in Step 9
+  readonly __placeholder?: never;
 }

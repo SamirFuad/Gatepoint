@@ -5,5 +5,5 @@
 // =============================================================
 
 export interface IEmailService {
-  // To be defined in Step 13
+  readonly __placeholder?: never;
 }

@@ -5,5 +5,5 @@
 // =============================================================
 
 export interface IRegistrationService {
-  // To be defined in Step 11
+  readonly __placeholder?: never;
 }

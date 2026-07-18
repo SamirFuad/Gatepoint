@@ -12,6 +12,7 @@
 // =============================================================
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database.types';
 
 /**
  * Creates a Supabase admin client that bypasses RLS.
@@ -43,7 +44,7 @@ export function createAdminClient() {
     );
   }
 
-  return createSupabaseClient(supabaseUrl, serviceRoleKey, {
+  return createSupabaseClient<Database>(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
