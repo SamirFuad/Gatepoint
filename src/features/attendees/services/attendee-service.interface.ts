@@ -1,9 +1,12 @@
-// =============================================================
-// Gatepoint — Attendee Service Interface (Placeholder)
-// =============================================================
-// Will be implemented in Step 11 alongside Registrations
-// =============================================================
+import type { ApiResponse, PaginatedResponse, PaginationParams } from '@/types';
+import type { Registration } from '@/features/registrations/services/registration-service.interface';
+
+export type Attendee = Registration;
 
 export interface IAttendeeService {
-  readonly __placeholder?: never;
+  listByEvent(
+    eventId: string,
+    pagination: PaginationParams
+  ): Promise<ApiResponse<PaginatedResponse<Attendee>>>;
 }
+

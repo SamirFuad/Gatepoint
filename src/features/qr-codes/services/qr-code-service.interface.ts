@@ -1,9 +1,26 @@
-// =============================================================
-// Gatepoint — QR Code Service Interface (Placeholder)
-// =============================================================
-// Will be implemented in Step 12: QR Code Generation
-// =============================================================
+import type { ApiResponse } from '@/types';
+
+export type QRCodeRecord = {
+  id: string;
+  registrationId: string;
+  eventId: string;
+  organizationId: string;
+  code: string;
+  qrImageUrl: string | null;
+  isUsed: boolean;
+  usedAt: string | null;
+  createdAt: string;
+};
 
 export interface IQRCodeService {
-  readonly __placeholder?: never;
+  generateForRegistration(
+    registrationId: string
+  ): Promise<ApiResponse<QRCodeRecord>>;
+
+  getByRegistrationId(
+    registrationId: string
+  ): Promise<ApiResponse<QRCodeRecord>>;
+
+  listByEvent(eventId: string): Promise<ApiResponse<QRCodeRecord[]>>;
 }
+

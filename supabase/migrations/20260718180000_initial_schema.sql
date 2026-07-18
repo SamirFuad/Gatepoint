@@ -16,162 +16,13 @@ begin
 end;
 $$;
 
-create or replace function public.is_org_member(target_organization_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.organization_members om
-    where om.organization_id = target_organization_id
-      and om.user_id = auth.uid()
-  );
-$$;
-
-create or replace function public.has_org_role(
-  target_organization_id uuid,
-  allowed_roles text[]
-)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.organization_members om
-    where om.organization_id = target_organization_id
-      and om.user_id = auth.uid()
-      and om.role = any(allowed_roles)
-  );
-$$;
-
-create or replace function public.is_event_org_member(target_event_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.events e
-    join public.organization_members om
-      on om.organization_id = e.organization_id
-    where e.id = target_event_id
-      and om.user_id = auth.uid()
-  );
-$$;
-
-create or replace function public.can_manage_event(target_event_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.events e
-    join public.organization_members om
-      on om.organization_id = e.organization_id
-    where e.id = target_event_id
-      and om.user_id = auth.uid()
-      and om.role in ('owner', 'admin', 'organizer')
-  );
-$$;
-
-create or replace function public.can_admin_event(target_event_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.events e
-    join public.organization_members om
-      on om.organization_id = e.organization_id
-    where e.id = target_event_id
-      and om.user_id = auth.uid()
-      and om.role in ('owner', 'admin')
-  );
-$$;
-
-create or replace function public.is_registration_org_member(
-  target_registration_id uuid
-)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.registrations r
-    join public.organization_members om
-      on om.organization_id = r.organization_id
-    where r.id = target_registration_id
-      and om.user_id = auth.uid()
-  );
-$$;
-
-create or replace function public.can_admin_registration(
-  target_registration_id uuid
-)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.registrations r
-    join public.organization_members om
-      on om.organization_id = r.organization_id
-    where r.id = target_registration_id
-      and om.user_id = auth.uid()
-      and om.role in ('owner', 'admin')
-  );
-$$;
-
-create or replace function public.can_submit_registration_response(
-  target_registration_id uuid,
-  target_field_id uuid
-)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.registrations r
-    join public.registration_forms rf on rf.id = r.form_id
-    join public.form_fields ff on ff.form_id = rf.id
-    join public.events e on e.id = r.event_id
-    where r.id = target_registration_id
-      and ff.id = target_field_id
-      and e.is_published = true
-      and e.status = 'published'
-      and rf.is_active = true
-  );
-$$;
-
 -- ---------------------------------------------------------------------------
 -- Tables
 -- ---------------------------------------------------------------------------
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
+  email text not null,
   full_name text,
   avatar_url text,
   created_at timestamptz not null default now(),
@@ -375,9 +226,10 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url)
+  insert into public.profiles (id, email, full_name, avatar_url)
   values (
     new.id,
+    new.email,
     nullif(new.raw_user_meta_data ->> 'full_name', ''),
     nullif(new.raw_user_meta_data ->> 'avatar_url', '')
   )
@@ -385,6 +237,203 @@ begin
 
   return new;
 end;
+$$;
+
+create or replace function public.create_organization_with_owner(
+  organization_name text,
+  organization_slug text,
+  organization_description text default null,
+  organization_website text default null
+)
+returns public.organizations
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  created_organization public.organizations;
+begin
+  if auth.uid() is null then
+    raise exception 'Authentication required';
+  end if;
+
+  insert into public.organizations (
+    name,
+    slug,
+    description,
+    website
+  )
+  values (
+    organization_name,
+    organization_slug,
+    nullif(organization_description, ''),
+    nullif(organization_website, '')
+  )
+  returning * into created_organization;
+
+  insert into public.organization_members (
+    organization_id,
+    user_id,
+    role
+  )
+  values (
+    created_organization.id,
+    auth.uid(),
+    'owner'
+  );
+
+  return created_organization;
+end;
+$$;
+
+create or replace function public.is_org_member(target_organization_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.organization_members om
+    where om.organization_id = target_organization_id
+      and om.user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.has_org_role(
+  target_organization_id uuid,
+  allowed_roles text[]
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.organization_members om
+    where om.organization_id = target_organization_id
+      and om.user_id = auth.uid()
+      and om.role = any(allowed_roles)
+  );
+$$;
+
+create or replace function public.is_event_org_member(target_event_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.events e
+    join public.organization_members om
+      on om.organization_id = e.organization_id
+    where e.id = target_event_id
+      and om.user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.can_manage_event(target_event_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.events e
+    join public.organization_members om
+      on om.organization_id = e.organization_id
+    where e.id = target_event_id
+      and om.user_id = auth.uid()
+      and om.role in ('owner', 'admin', 'organizer')
+  );
+$$;
+
+create or replace function public.can_admin_event(target_event_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.events e
+    join public.organization_members om
+      on om.organization_id = e.organization_id
+    where e.id = target_event_id
+      and om.user_id = auth.uid()
+      and om.role in ('owner', 'admin')
+  );
+$$;
+
+create or replace function public.is_registration_org_member(
+  target_registration_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.registrations r
+    join public.organization_members om
+      on om.organization_id = r.organization_id
+    where r.id = target_registration_id
+      and om.user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.can_admin_registration(
+  target_registration_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.registrations r
+    join public.organization_members om
+      on om.organization_id = r.organization_id
+    where r.id = target_registration_id
+      and om.user_id = auth.uid()
+      and om.role in ('owner', 'admin')
+  );
+$$;
+
+create or replace function public.can_submit_registration_response(
+  target_registration_id uuid,
+  target_field_id uuid
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.registrations r
+    join public.registration_forms rf on rf.id = r.form_id
+    join public.form_fields ff on ff.form_id = rf.id
+    join public.events e on e.id = r.event_id
+    where r.id = target_registration_id
+      and ff.id = target_field_id
+      and e.is_published = true
+      and e.status = 'published'
+      and rf.is_active = true
+  );
 $$;
 
 -- ---------------------------------------------------------------------------

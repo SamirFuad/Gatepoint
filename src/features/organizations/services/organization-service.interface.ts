@@ -35,7 +35,12 @@ export type CreateOrganizationData = {
 /**
  * Data for updating an organization.
  */
-export type UpdateOrganizationData = Partial<CreateOrganizationData>;
+export type UpdateOrganizationData = Partial<
+  Omit<CreateOrganizationData, 'description' | 'website'>
+> & {
+  description?: string | null;
+  website?: string | null;
+};
 
 /**
  * Represents a member of an organization.

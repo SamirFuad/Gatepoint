@@ -43,8 +43,9 @@ export const ROUTES = {
   ORGANIZATION_MEMBERS: '/organization/members',
 
   // Public — Event Pages
-  PUBLIC_EVENT: (slug: string) => `/events/${slug}` as const,
-  PUBLIC_REGISTER: (slug: string) => `/events/${slug}/register` as const,
+  PUBLIC_EVENT: (slug: string) => `/public/events/${slug}` as const,
+  PUBLIC_REGISTER: (slug: string) =>
+    `/public/events/${slug}/register` as const,
 } as const;
 
 // ---- Auth ----

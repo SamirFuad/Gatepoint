@@ -12,6 +12,7 @@ export type Database = {
       profiles: {
         Row: {
           id: string;
+          email: string;
           full_name: string | null;
           avatar_url: string | null;
           created_at: string;
@@ -19,6 +20,7 @@ export type Database = {
         };
         Insert: {
           id: string;
+          email: string;
           full_name?: string | null;
           avatar_url?: string | null;
           created_at?: string;
@@ -26,6 +28,7 @@ export type Database = {
         };
         Update: {
           id?: string;
+          email?: string;
           full_name?: string | null;
           avatar_url?: string | null;
           created_at?: string;
@@ -545,6 +548,15 @@ export type Database = {
         };
         Returns: boolean;
       };
+      create_organization_with_owner: {
+        Args: {
+          organization_name: string;
+          organization_slug: string;
+          organization_description?: string | null;
+          organization_website?: string | null;
+        };
+        Returns: Database['public']['Tables']['organizations']['Row'];
+      };
       has_org_role: {
         Args: {
           target_organization_id: string;
@@ -569,4 +581,3 @@ export type Database = {
     CompositeTypes: Record<string, never>;
   };
 };
-
