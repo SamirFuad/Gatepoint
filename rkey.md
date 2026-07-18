@@ -1,2 +1,3 @@
 EXT_PUBLIC_SUPABASE_URL= https://jqwlnnimuzgabraheeac.supabase.co/rest/v1/
 NEXT_PUBLIC_SUPABASE_ANON_KEY= sb_publishable_rV-wPRD6XsK-IPR0EnW2mQ_SB7KRQJB
+RESEND_API_KEY= re_B4N9RSRw_CP9k5HmZy3fNqCsVTYeagQTE
