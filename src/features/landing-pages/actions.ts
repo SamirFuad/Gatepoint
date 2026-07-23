@@ -10,6 +10,24 @@ export type LandingPageActionState = {
   success?: boolean;
 };
 
+function parseAgendaItems(raw: FormDataEntryValue | null) {
+  if (!raw || typeof raw !== 'string') {
+    return undefined;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch {
+    // ignore
+  }
+
+  return undefined;
+}
+
 export async function updateLandingPageAction(
   eventId: string,
   _state: LandingPageActionState,
@@ -22,6 +40,7 @@ export async function updateLandingPageAction(
     agenda: formData.get('agenda'),
     venueNote: formData.get('venueNote'),
     contactEmail: formData.get('contactEmail'),
+    agendaItems: parseAgendaItems(formData.get('agendaItems')),
   });
 
   if (!parsed.success) {
@@ -38,4 +57,3 @@ export async function updateLandingPageAction(
   revalidatePath(`/events/${eventId}/landing-page`);
   return { success: true, message: 'Landing page updated.' };
 }
-

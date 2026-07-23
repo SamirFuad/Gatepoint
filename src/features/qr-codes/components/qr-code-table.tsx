@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useActionState } from 'react';
-import { QrCode } from 'lucide-react';
+import { Download, QrCode } from 'lucide-react';
 import {
   generateQRCodeAction,
   type QRCodeActionState,
@@ -46,6 +46,15 @@ function FormMessage({ state }: { state: QRCodeActionState }) {
   );
 }
 
+function downloadQRCode(dataUrl: string, filename: string) {
+  const link = document.createElement('a');
+  link.href = dataUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 export function QRCodeTable({
   eventId,
   registrations,
@@ -80,7 +89,7 @@ export function QRCodeTable({
               <TableHead>Attendee</TableHead>
               <TableHead>Code</TableHead>
               <TableHead>QR</TableHead>
-              <TableHead className="w-36 text-right">Action</TableHead>
+              <TableHead className="w-48 text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -112,17 +121,34 @@ export function QRCodeTable({
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <form action={action}>
-                      <input type="hidden" name="eventId" value={eventId} />
-                      <input
-                        type="hidden"
-                        name="registrationId"
-                        value={registration.id}
-                      />
-                      <Button type="submit" size="sm" disabled={pending}>
-                        {qrCode ? 'Refresh' : 'Generate'}
-                      </Button>
-                    </form>
+                    <div className="flex items-center justify-end gap-2">
+                      {qrCode?.qrImageUrl ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            downloadQRCode(
+                              qrCode.qrImageUrl!,
+                              `qr-${registration.confirmationNumber}.png`
+                            )
+                          }
+                        >
+                          <Download className="size-4" />
+                        </Button>
+                      ) : null}
+                      <form action={action}>
+                        <input type="hidden" name="eventId" value={eventId} />
+                        <input
+                          type="hidden"
+                          name="registrationId"
+                          value={registration.id}
+                        />
+                        <Button type="submit" size="sm" disabled={pending}>
+                          {qrCode ? 'Refresh' : 'Generate'}
+                        </Button>
+                      </form>
+                    </div>
                   </TableCell>
                 </TableRow>
               );

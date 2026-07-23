@@ -1,5 +1,32 @@
 import { z } from 'zod';
 
+export const agendaItemSchema = z.object({
+  time: z
+    .string()
+    .trim()
+    .min(1, 'Time is required.')
+    .max(20, 'Time must be 20 characters or fewer.'),
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Title is required.')
+    .max(200, 'Title must be 200 characters or fewer.'),
+  description: z
+    .string()
+    .trim()
+    .max(500, 'Description must be 500 characters or fewer.')
+    .optional()
+    .or(z.literal('')),
+  speaker: z
+    .string()
+    .trim()
+    .max(100, 'Speaker must be 100 characters or fewer.')
+    .optional()
+    .or(z.literal('')),
+});
+
+export type AgendaItem = z.infer<typeof agendaItemSchema>;
+
 export const landingPageConfigSchema = z.object({
   headline: z
     .string()
@@ -34,6 +61,7 @@ export const landingPageConfigSchema = z.object({
     .email('Enter a valid contact email.')
     .optional()
     .or(z.literal('')),
+  agendaItems: z.array(agendaItemSchema).optional(),
 });
 
 export type LandingPageConfig = z.infer<typeof landingPageConfigSchema>;
@@ -46,6 +74,6 @@ export function defaultLandingPageConfig(eventTitle: string): LandingPageConfig 
     agenda: '',
     venueNote: '',
     contactEmail: '',
+    agendaItems: [],
   };
 }
-

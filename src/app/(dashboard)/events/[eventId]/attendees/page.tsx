@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { createEventService } from '@/features/events/services/supabase-event-service';
 import { RegistrationTable } from '@/features/registrations/components/registration-table';
 import { createAttendeeService } from '@/features/attendees/services/supabase-attendee-service';
+import { AttendeeToolbar } from '@/features/attendees/components/attendee-toolbar';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,10 +12,13 @@ export const metadata = {
 
 export default async function AttendeesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ eventId: string }>;
+  searchParams: Promise<{ search?: string }>;
 }) {
   const { eventId } = await params;
+  const { search } = await searchParams;
   const eventService = createEventService();
   const eventResult = await eventService.getById(eventId);
 
@@ -23,10 +27,11 @@ export default async function AttendeesPage({
   }
 
   const attendeeService = createAttendeeService();
-  const attendeesResult = await attendeeService.listByEvent(eventId, {
-    page: 1,
-    pageSize: 100,
-  });
+  const attendeesResult = await attendeeService.listByEvent(
+    eventId,
+    { page: 1, pageSize: 100 },
+    search
+  );
 
   if (attendeesResult.error) {
     throw new Error(attendeesResult.error.message);
@@ -40,6 +45,7 @@ export default async function AttendeesPage({
           Registrations for {eventResult.data.title}.
         </p>
       </div>
+      <AttendeeToolbar eventId={eventId} initialSearch={search} />
       <RegistrationTable
         eventId={eventId}
         registrations={attendeesResult.data?.data ?? []}
@@ -47,4 +53,3 @@ export default async function AttendeesPage({
     </div>
   );
 }
-

@@ -48,12 +48,17 @@ export interface IRegistrationService {
 
   listByEvent(
     eventId: string,
-    pagination: PaginationParams
+    pagination: PaginationParams,
+    search?: string
   ): Promise<ApiResponse<PaginatedResponse<Registration>>>;
+
+  /** Fetch all registrations for an event (no pagination, for export). */
+  listAllByEvent(eventId: string): Promise<ApiResponse<Registration[]>>;
 
   updateStatus(
     id: string,
     status: RegistrationStatus
   ): Promise<ApiResponse<Registration>>;
 }
+
 

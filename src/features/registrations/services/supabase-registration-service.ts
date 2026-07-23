@@ -152,15 +152,25 @@ export class SupabaseRegistrationService implements IRegistrationService {
 
   async listByEvent(
     eventId: string,
-    pagination: PaginationParams
+    pagination: PaginationParams,
+    search?: string
   ): Promise<ApiResponse<PaginatedResponse<Registration>>> {
     const supabase = await createClient();
     const from = (pagination.page - 1) * pagination.pageSize;
     const to = from + pagination.pageSize - 1;
-    const { data, error, count } = await supabase
+    let query = supabase
       .from('registrations')
       .select('*', { count: 'exact' })
-      .eq('event_id', eventId)
+      .eq('event_id', eventId);
+
+    if (search && search.trim().length > 0) {
+      const term = `%${search.trim()}%`;
+      query = query.or(
+        `full_name.ilike.${term},email.ilike.${term},confirmation_number.ilike.${term}`
+      );
+    }
+
+    const { data, error, count } = await query
       .order('registered_at', { ascending: false })
       .range(from, to);
 
@@ -180,6 +190,23 @@ export class SupabaseRegistrationService implements IRegistrationService {
       },
       error: null,
     };
+  }
+
+  async listAllByEvent(
+    eventId: string
+  ): Promise<ApiResponse<Registration[]>> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('event_id', eventId)
+      .order('registered_at', { ascending: false });
+
+    if (error) {
+      return { data: null, error: toApiError(error) };
+    }
+
+    return { data: data.map(toRegistration), error: null };
   }
 
   async updateStatus(
