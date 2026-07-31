@@ -27,7 +27,7 @@ Keep service role and email keys server-side only. Do not prefix private keys wi
 
 1. Apply the migrations in `supabase/migrations` to the hosted Supabase project.
 2. Confirm the public schema includes organizations, events, registration forms, registrations, responses, and QR code tables.
-3. Add the production app URL to Supabase Auth redirect URLs.
+3. In Supabase Auth URL Configuration, set the Site URL to your production app URL and add `https://your-domain.example/auth/callback` to Redirect URLs. For local development, also add `http://localhost:3000/auth/callback`.
 4. Use the Supabase project URL without `/rest/v1` for `NEXT_PUBLIC_SUPABASE_URL`.
 
 ## Resend Setup

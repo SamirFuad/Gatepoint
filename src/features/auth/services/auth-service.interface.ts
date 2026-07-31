@@ -73,7 +73,6 @@ export interface IAuthService {
 
   /** Initiate OAuth sign-in; returns the provider's consent URL */
   signInWithOAuth(
-    provider: OAuthProvider,
-    redirectTo?: string
+    provider: OAuthProvider
   ): Promise<ApiResponse<{ url: string }>>;
 }

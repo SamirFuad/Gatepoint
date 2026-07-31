@@ -146,16 +146,15 @@ export class SupabaseAuthService implements IAuthService {
   }
 
   async signInWithOAuth(
-    provider: OAuthProvider,
-    redirectTo?: string
+    provider: OAuthProvider
   ): Promise<ApiResponse<{ url: string }>> {
     const supabase = await createClient();
-    const callbackPath = `/auth/callback${redirectTo ? `?next=${encodeURIComponent(redirectTo)}` : ''}`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${appUrl()}${callbackPath}`,
+        // Keep this URL static so it can be allow-listed exactly in Supabase.
+        redirectTo: `${appUrl().replace(/\/$/, '')}/auth/callback`,
       },
     });
 
