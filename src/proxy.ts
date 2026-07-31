@@ -32,7 +32,7 @@ const AUTH_ROUTES = [
 ];
 
 // Routes that are always public
-const PUBLIC_ROUTES = ['/', '/verify-email', '/api'];
+const PUBLIC_ROUTES = ['/', '/verify-email', '/api', '/auth/callback'];
 
 /**
  * Checks if the current path matches any of the given route prefixes.

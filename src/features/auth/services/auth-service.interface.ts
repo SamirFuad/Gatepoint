@@ -13,6 +13,11 @@
 import type { ApiResponse } from '@/types';
 
 /**
+ * Supported OAuth providers.
+ */
+export type OAuthProvider = 'google';
+
+/**
  * Represents the authenticated user's profile.
  */
 export type AuthUser = {
@@ -65,4 +70,10 @@ export interface IAuthService {
 
   /** Resend email verification */
   resendVerification(email: string): Promise<ApiResponse<null>>;
+
+  /** Initiate OAuth sign-in; returns the provider's consent URL */
+  signInWithOAuth(
+    provider: OAuthProvider,
+    redirectTo?: string
+  ): Promise<ApiResponse<{ url: string }>>;
 }

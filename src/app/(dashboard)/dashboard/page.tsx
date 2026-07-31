@@ -7,6 +7,7 @@ import {
   Plus,
   QrCode,
   Ticket,
+  UserCheck,
   Users,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -66,6 +67,11 @@ export default async function DashboardPage() {
       icon: Users,
     },
     {
+      label: 'Checked in',
+      value: dashboard.stats.checkedInAttendees,
+      icon: UserCheck,
+    },
+    {
       label: 'QR codes',
       value: dashboard.stats.totalQrCodes,
       icon: QrCode,
@@ -94,7 +100,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {stats.map((stat) => (
           <div key={stat.label} className="rounded-lg border bg-card p-5">
             <div className="flex items-center justify-between">

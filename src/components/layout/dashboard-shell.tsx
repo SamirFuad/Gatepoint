@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   Building2,
@@ -7,6 +10,7 @@ import {
   Menu,
   Settings,
   Users,
+  X,
 } from 'lucide-react';
 import { logoutAction } from '@/features/auth/actions';
 import { Button } from '@/components/ui/button';
@@ -34,13 +38,14 @@ const NAV_ITEMS = [
   },
 ];
 
-function NavLinks() {
+function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <nav className="flex flex-col gap-1">
       {NAV_ITEMS.map((item) => (
         <Link
           key={item.href}
           href={item.href}
+          onClick={onNavigate}
           className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <item.icon className="size-4" />
@@ -67,6 +72,8 @@ export function DashboardShell({
 }: {
   children: React.ReactNode;
 }) {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-muted/30">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r bg-background md:flex md:flex-col">
@@ -89,6 +96,45 @@ export function DashboardShell({
         </div>
       </aside>
 
+      {/* Mobile nav overlay */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
+      {/* Mobile nav drawer */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 border-r bg-background transition-transform duration-200 ease-in-out md:hidden ${
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex h-16 items-center justify-between border-b px-5">
+          <div className="flex items-center gap-2">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Building2 className="size-5" />
+            </div>
+            <div className="font-semibold leading-none">Gatepoint</div>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close navigation"
+          >
+            <X />
+          </Button>
+        </div>
+        <div className="flex-1 px-3 py-4">
+          <NavLinks onNavigate={() => setMobileNavOpen(false)} />
+        </div>
+        <div className="border-t p-3">
+          <LogoutButton />
+        </div>
+      </aside>
+
       <div className="md:pl-64">
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur md:px-6">
           <div className="flex items-center gap-3">
@@ -98,6 +144,7 @@ export function DashboardShell({
               size="icon"
               className="md:hidden"
               aria-label="Open navigation"
+              onClick={() => setMobileNavOpen(true)}
             >
               <Menu />
             </Button>
@@ -112,10 +159,6 @@ export function DashboardShell({
             <LogoutButton />
           </div>
         </header>
-
-        <div className="border-b bg-background px-4 py-2 md:hidden">
-          <NavLinks />
-        </div>
 
         <main className="p-4 md:p-6">{children}</main>
       </div>

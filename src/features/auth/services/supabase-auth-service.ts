@@ -4,6 +4,7 @@ import type {
   AuthUser,
   IAuthService,
   LoginCredentials,
+  OAuthProvider,
   RegisterData,
 } from './auth-service.interface';
 
@@ -142,6 +143,34 @@ export class SupabaseAuthService implements IAuthService {
     });
 
     return { data: null, error: error ? toApiError(error) : null };
+  }
+
+  async signInWithOAuth(
+    provider: OAuthProvider,
+    redirectTo?: string
+  ): Promise<ApiResponse<{ url: string }>> {
+    const supabase = await createClient();
+    const callbackPath = `/auth/callback${redirectTo ? `?next=${encodeURIComponent(redirectTo)}` : ''}`;
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${appUrl()}${callbackPath}`,
+      },
+    });
+
+    if (error) {
+      return { data: null, error: toApiError(error) };
+    }
+
+    if (!data.url) {
+      return {
+        data: null,
+        error: { message: 'Unable to initiate OAuth sign-in.' },
+      };
+    }
+
+    return { data: { url: data.url }, error: null };
   }
 }
 
