@@ -21,6 +21,10 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(new URL('/dashboard', origin));
     }
+
+    // The message is available in Vercel Function Logs without exposing
+    // Supabase implementation details to the browser.
+    console.error('Supabase OAuth callback failed:', error.message);
   }
 
   // If code is missing or exchange failed, redirect to login with error

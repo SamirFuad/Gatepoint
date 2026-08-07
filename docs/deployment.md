@@ -27,7 +27,7 @@ Keep service role and email keys server-side only. Do not prefix private keys wi
 
 1. Apply the migrations in `supabase/migrations` to the hosted Supabase project.
 2. Confirm the public schema includes organizations, events, registration forms, registrations, responses, and QR code tables.
-3. In Supabase Auth URL Configuration, set the Site URL to your production app URL and add `https://your-domain.example/auth/callback` to Redirect URLs. For local development, also add `http://localhost:3000/auth/callback`.
+3. In Supabase Auth URL Configuration, set the Site URL to your production app URL and add `https://your-domain.example/auth/callback` to Redirect URLs. For local development, also add `http://localhost:3000/auth/callback`. If you test OAuth on Vercel preview deployments, add `https://*-your-vercel-account.vercel.app/**` as well; the app returns OAuth to the preview host so its PKCE session cookie is retained.
 4. Use the Supabase project URL without `/rest/v1` for `NEXT_PUBLIC_SUPABASE_URL`.
 
 ## Resend Setup
