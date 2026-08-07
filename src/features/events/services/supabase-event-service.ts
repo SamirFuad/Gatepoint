@@ -149,7 +149,7 @@ export class SupabaseEventService implements IEventService {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('events')
-      .select('*, registrations(count)')
+      .select('*, registrations!registrations_event_id_fkey(count)')
       .eq('id', id)
       .single();
 
@@ -164,7 +164,7 @@ export class SupabaseEventService implements IEventService {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('events')
-      .select('*, registrations(count)')
+      .select('*, registrations!registrations_event_id_fkey(count)')
       .eq('slug', slug)
       .single();
 
@@ -212,7 +212,9 @@ export class SupabaseEventService implements IEventService {
     const to = from + pagination.pageSize - 1;
     let query = supabase
       .from('events')
-      .select('*, registrations(count)', { count: 'exact' })
+      .select('*, registrations!registrations_event_id_fkey(count)', {
+        count: 'exact',
+      })
       .eq('organization_id', organizationId);
 
     if (filters?.status) {

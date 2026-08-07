@@ -105,14 +105,16 @@ export class SupabaseDashboardService implements IDashboardService {
         .eq('organization_id', organizationId),
       supabase
         .from('events')
-        .select('id, title, status, starts_at, max_attendees, registrations(count)')
+        .select(
+          'id, title, status, starts_at, max_attendees, registrations!registrations_event_id_fkey(count)'
+        )
         .eq('organization_id', organizationId)
         .gte('starts_at', new Date().toISOString())
         .order('starts_at', { ascending: true })
         .limit(4),
       supabase
         .from('registrations')
-        .select('*, events(title)')
+        .select('*, events!registrations_event_id_fkey(title)')
         .eq('organization_id', organizationId)
         .order('registered_at', { ascending: false })
         .limit(6),

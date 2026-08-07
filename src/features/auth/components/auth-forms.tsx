@@ -11,8 +11,7 @@ import {
   resetPasswordAction,
   type AuthActionState,
 } from '@/features/auth/actions';
-import { googleSignInAction } from '@/features/auth/actions/google-auth-action';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -133,18 +132,17 @@ export function LoginForm({
         <CardDescription>Sign in to manage your events.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={googleSignInAction} className="mb-1">
-          <input type="hidden" name="redirectTo" value={redirectTo} />
-          <Button
-            type="submit"
-            variant="outline"
-            size="lg"
-            className="w-full gap-2"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </Button>
-        </form>
+        <a
+          href="/auth/google"
+          className={buttonVariants({
+            variant: 'outline',
+            size: 'lg',
+            className: 'mb-1 w-full gap-2',
+          })}
+        >
+          <GoogleIcon />
+          Continue with Google
+        </a>
         <OAuthDivider />
         <form action={action} className="space-y-4">
           <input type="hidden" name="redirectTo" value={redirectTo} />
@@ -200,17 +198,17 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={googleSignInAction} className="mb-1">
-          <Button
-            type="submit"
-            variant="outline"
-            size="lg"
-            className="w-full gap-2"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </Button>
-        </form>
+        <a
+          href="/auth/google"
+          className={buttonVariants({
+            variant: 'outline',
+            size: 'lg',
+            className: 'mb-1 w-full gap-2',
+          })}
+        >
+          <GoogleIcon />
+          Continue with Google
+        </a>
         <OAuthDivider />
         <form action={action} className="space-y-4">
           <FormMessage state={state} />
