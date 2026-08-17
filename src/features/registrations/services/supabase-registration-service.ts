@@ -1,4 +1,5 @@
 import { customAlphabet } from 'nanoid';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import type {
   ApiError,
@@ -74,7 +75,22 @@ export class SupabaseRegistrationService implements IRegistrationService {
   async create(
     data: CreateRegistrationData
   ): Promise<ApiResponse<RegistrationWithResponses>> {
-    const supabase = await createClient();
+    let supabase: ReturnType<typeof createAdminClient>;
+
+    try {
+      supabase = createAdminClient();
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Unable to create a registration.',
+        },
+      };
+    }
+
     const { data: registration, error } = await supabase
       .from('registrations')
       .insert({

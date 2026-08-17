@@ -175,6 +175,23 @@ export class SupabaseEventService implements IEventService {
     return { data: toEvent(data as EventRow), error: null };
   }
 
+  async listPublished(): Promise<ApiResponse<Event[]>> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('is_published', true)
+      .eq('status', 'published')
+      .gte('ends_at', new Date().toISOString())
+      .order('starts_at', { ascending: true });
+
+    if (error) {
+      return { data: null, error: toApiError(error) };
+    }
+
+    return { data: data.map((event) => toEvent(event as EventRow)), error: null };
+  }
+
   async update(
     id: string,
     data: UpdateEventData

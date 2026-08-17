@@ -33,6 +33,12 @@ export function MarketingHeader() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 md:flex">
+          <Link
+            href="/public/events"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Explore events
+          </Link>
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -82,6 +88,13 @@ export function MarketingHeader() {
       {mobileMenuOpen && (
         <div className="border-t md:hidden">
           <nav className="mx-auto max-w-7xl space-y-1 px-4 py-4 sm:px-6">
+            <Link
+              href="/public/events"
+              className="block rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Explore events
+            </Link>
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}

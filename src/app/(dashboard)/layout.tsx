@@ -6,11 +6,22 @@
 // =============================================================
 
 import { DashboardShell } from '@/components/layout/dashboard-shell';
+import { createOrganizationService } from '@/features/organizations/services/supabase-organization-service';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardShell>{children}</DashboardShell>;
+  const result = await createOrganizationService().getUserOrganizations();
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+
+  return (
+    <DashboardShell hasOrganization={Boolean(result.data?.length)}>
+      {children}
+    </DashboardShell>
+  );
 }

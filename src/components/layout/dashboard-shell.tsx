@@ -5,9 +5,11 @@ import Link from 'next/link';
 import {
   Building2,
   CalendarDays,
+  Compass,
   LayoutDashboard,
   LogOut,
   Menu,
+  Plus,
   Settings,
   Users,
   X,
@@ -15,12 +17,26 @@ import {
 import { logoutAction } from '@/features/auth/actions';
 import { Button } from '@/components/ui/button';
 
-const NAV_ITEMS = [
+const ATTENDEE_NAV_ITEMS = [
   {
     href: '/dashboard',
     label: 'Dashboard',
     icon: LayoutDashboard,
   },
+  {
+    href: '/public/events',
+    label: 'Browse events',
+    icon: Compass,
+  },
+  {
+    href: '/events/new',
+    label: 'Create an event',
+    icon: Plus,
+  },
+];
+
+const ORGANIZER_NAV_ITEMS = [
+  ...ATTENDEE_NAV_ITEMS.slice(0, 2),
   {
     href: '/events',
     label: 'Events',
@@ -38,10 +54,18 @@ const NAV_ITEMS = [
   },
 ];
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({
+  hasOrganization,
+  onNavigate,
+}: {
+  hasOrganization: boolean;
+  onNavigate?: () => void;
+}) {
+  const navItems = hasOrganization ? ORGANIZER_NAV_ITEMS : ATTENDEE_NAV_ITEMS;
+
   return (
     <nav className="flex flex-col gap-1">
-      {NAV_ITEMS.map((item) => (
+      {navItems.map((item) => (
         <Link
           key={item.href}
           href={item.href}
@@ -69,8 +93,10 @@ function LogoutButton() {
 
 export function DashboardShell({
   children,
+  hasOrganization,
 }: {
   children: React.ReactNode;
+  hasOrganization: boolean;
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -89,7 +115,7 @@ export function DashboardShell({
           </div>
         </div>
         <div className="flex-1 px-3 py-4">
-          <NavLinks />
+          <NavLinks hasOrganization={hasOrganization} />
         </div>
         <div className="border-t p-3">
           <LogoutButton />
@@ -128,7 +154,10 @@ export function DashboardShell({
           </Button>
         </div>
         <div className="flex-1 px-3 py-4">
-          <NavLinks onNavigate={() => setMobileNavOpen(false)} />
+          <NavLinks
+            hasOrganization={hasOrganization}
+            onNavigate={() => setMobileNavOpen(false)}
+          />
         </div>
         <div className="border-t p-3">
           <LogoutButton />
@@ -149,9 +178,13 @@ export function DashboardShell({
               <Menu />
             </Button>
             <div>
-              <div className="text-sm font-semibold">Workspace</div>
+              <div className="text-sm font-semibold">
+                {hasOrganization ? 'Workspace' : 'Your account'}
+              </div>
               <div className="text-xs text-muted-foreground">
-                Manage events and registrations
+                {hasOrganization
+                  ? 'Manage events and registrations'
+                  : 'Browse events and manage registrations'}
               </div>
             </div>
           </div>

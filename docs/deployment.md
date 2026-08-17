@@ -13,15 +13,10 @@ NEXT_PUBLIC_APP_URL=https://your-domain.example
 NEXT_PUBLIC_APP_NAME=Gatepoint
 RESEND_API_KEY=your-resend-api-key
 RESEND_FROM_EMAIL=Gatepoint <noreply@your-domain.example>
-```
-
-Optional:
-
-```txt
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-Keep service role and email keys server-side only. Do not prefix private keys with `NEXT_PUBLIC_`.
+Keep service role and email keys server-side only. Do not prefix private keys with `NEXT_PUBLIC_`. The service role key is required for automatic QR code generation and delivery after public registrations.
 
 ## Supabase Production Setup
 

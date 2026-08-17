@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createOrganizationService } from '@/features/organizations/services/supabase-organization-service';
+import { createClient } from '@/lib/supabase/server';
 import { createEventService } from './services/supabase-event-service';
 import { eventIdSchema, eventSchema, updateEventSchema } from './schemas/event-schemas';
 
@@ -30,10 +31,41 @@ async function getCurrentOrganizationId() {
     return { organizationId: null, error: organizations.error.message };
   }
 
-  return {
-    organizationId: organizations.data?.[0]?.id ?? null,
-    error: null,
-  };
+  const existingOrganizationId = organizations.data?.[0]?.id;
+
+  if (existingOrganizationId) {
+    return { organizationId: existingOrganizationId, error: null };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { organizationId: null, error: 'Authentication required.' };
+  }
+
+  const fullName =
+    typeof user.user_metadata.full_name === 'string'
+      ? user.user_metadata.full_name.trim()
+      : '';
+  const personalWorkspace = await organizationService.create({
+    name: fullName ? `${fullName.slice(0, 80)}'s events` : 'My events',
+    slug: `personal-${user.id.slice(0, 8)}`,
+  });
+
+  if (personalWorkspace.error || !personalWorkspace.data) {
+    return {
+      organizationId: null,
+      error:
+        personalWorkspace.error?.message ??
+        'Unable to create a personal event workspace.',
+    };
+  }
+
+  return { organizationId: personalWorkspace.data.id, error: null };
 }
 
 export async function createEventAction(

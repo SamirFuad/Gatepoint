@@ -1,9 +1,9 @@
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
   CalendarClock,
   CalendarDays,
   CheckCircle2,
+  Compass,
   Plus,
   QrCode,
   Ticket,
@@ -32,7 +32,42 @@ export default async function DashboardPage() {
   }
 
   if (!result.data?.length) {
-    redirect('/create-organization');
+    return (
+      <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 py-8">
+        <div>
+          <p className="text-sm font-medium text-primary">Welcome to Gatepoint</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+            Find events or host your own
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Browse published events, register as an attendee, or create an event
+            whenever you are ready. You do not need an organization to get started.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/public/events"
+            className={cn(buttonVariants({ size: 'lg' }), 'gap-2')}
+          >
+            <Compass />
+            Browse events
+          </Link>
+          <Link
+            href="/events/new"
+            className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), 'gap-2')}
+          >
+            <Plus />
+            Create an event
+          </Link>
+          <Link
+            href="/create-organization"
+            className={cn(buttonVariants({ size: 'lg', variant: 'ghost' }), 'gap-2')}
+          >
+            Create an organization
+          </Link>
+        </div>
+      </section>
+    );
   }
 
   const organization = result.data[0];

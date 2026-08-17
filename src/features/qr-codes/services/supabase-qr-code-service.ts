@@ -1,5 +1,6 @@
 import QRCode from 'qrcode';
 import { customAlphabet } from 'nanoid';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import type { ApiError, ApiResponse } from '@/types';
 import type { Database } from '@/types/database.types';
@@ -46,12 +47,34 @@ export class SupabaseQRCodeService implements IQRCodeService {
   async generateForRegistration(
     registrationId: string
   ): Promise<ApiResponse<QRCodeRecord>> {
-    const supabase = await createClient();
+    let supabase: ReturnType<typeof createAdminClient>;
 
-    const existing = await this.getByRegistrationId(registrationId);
+    try {
+      supabase = createAdminClient();
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Unable to generate a QR code.',
+        },
+      };
+    }
 
-    if (existing.data) {
-      return existing;
+    const { data: existing, error: existingError } = await supabase
+      .from('qr_codes')
+      .select('*')
+      .eq('registration_id', registrationId)
+      .maybeSingle();
+
+    if (existingError) {
+      return { data: null, error: toApiError(existingError) };
+    }
+
+    if (existing) {
+      return { data: toQRCode(existing), error: null };
     }
 
     const { data: registration, error: registrationError } = await supabase

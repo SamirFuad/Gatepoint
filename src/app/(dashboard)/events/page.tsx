@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { CalendarDays, Plus } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { CalendarDays, Compass, Plus } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/common/empty-state';
@@ -25,7 +24,33 @@ export default async function EventsPage() {
   const organization = organizationsResult.data?.[0];
 
   if (!organization) {
-    redirect('/create-organization');
+    return (
+      <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 py-8">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Host an event</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            You have not created an event yet. Gatepoint will create a private
+            personal workspace automatically when you publish your first event.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/events/new"
+            className={cn(buttonVariants({ size: 'lg' }), 'gap-2')}
+          >
+            <Plus />
+            Create an event
+          </Link>
+          <Link
+            href="/public/events"
+            className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), 'gap-2')}
+          >
+            <Compass />
+            Browse events
+          </Link>
+        </div>
+      </section>
+    );
   }
 
   const eventService = createEventService();

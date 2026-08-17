@@ -110,6 +110,9 @@ export interface IEventService {
   /** Get event by slug (for public pages) */
   getBySlug(slug: string): Promise<ApiResponse<Event>>;
 
+  /** List events available to the public */
+  listPublished(): Promise<ApiResponse<Event[]>>;
+
   /** Update an event */
   update(id: string, data: UpdateEventData): Promise<ApiResponse<Event>>;
 
