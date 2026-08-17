@@ -1,7 +1,9 @@
+import Image from 'next/image';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Download, QrCode } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { createQRCodeService } from '@/features/qr-codes/services/supabase-qr-code-service';
 
 export const metadata = {
   title: 'Registration Confirmed',
@@ -12,10 +14,12 @@ export default async function RegistrationSuccessPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ confirmation?: string }>;
+  searchParams: Promise<{ confirmation?: string; qr?: string }>;
 }) {
   const { slug } = await params;
-  const { confirmation } = await searchParams;
+  const { confirmation, qr } = await searchParams;
+  const qrResult = qr ? await createQRCodeService().getByCode(qr) : null;
+  const qrCode = qrResult?.data ?? null;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-4 py-12 text-center">
@@ -30,6 +34,33 @@ export default async function RegistrationSuccessPage({
         </span>
         .
       </p>
+      {qrCode?.qrImageUrl ? (
+        <section className="mx-auto mt-6 w-full max-w-sm rounded-lg border bg-card p-5">
+          <div className="flex items-center justify-center gap-2 text-sm font-medium">
+            <QrCode className="size-4 text-primary" />
+            Your check-in QR code
+          </div>
+          <Image
+            src={qrCode.qrImageUrl}
+            alt="Your event check-in QR code"
+            width={280}
+            height={280}
+            className="mx-auto mt-4 size-56"
+            unoptimized
+          />
+          <a
+            href={qrCode.qrImageUrl}
+            download={`${slug}-qr-code.png`}
+            className={cn(
+              buttonVariants({ variant: 'outline' }),
+              'mx-auto mt-4 gap-2'
+            )}
+          >
+            <Download />
+            Download QR code
+          </a>
+        </section>
+      ) : null}
       <Link
         href={`/public/events/${slug}`}
         className={cn(buttonVariants({ variant: 'outline' }), 'mx-auto mt-6')}

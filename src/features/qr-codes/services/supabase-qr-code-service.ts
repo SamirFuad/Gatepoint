@@ -135,6 +135,40 @@ export class SupabaseQRCodeService implements IQRCodeService {
     return { data: toQRCode(data), error: null };
   }
 
+  async getByCode(code: string): Promise<ApiResponse<QRCodeRecord>> {
+    let supabase: ReturnType<typeof createAdminClient>;
+
+    try {
+      supabase = createAdminClient();
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Unable to retrieve a QR code.',
+        },
+      };
+    }
+
+    const { data, error } = await supabase
+      .from('qr_codes')
+      .select('*')
+      .eq('code', code)
+      .maybeSingle();
+
+    if (error) {
+      return { data: null, error: toApiError(error) };
+    }
+
+    if (!data) {
+      return { data: null, error: { message: 'QR code not found.' } };
+    }
+
+    return { data: toQRCode(data), error: null };
+  }
+
   async listByEvent(eventId: string): Promise<ApiResponse<QRCodeRecord[]>> {
     const supabase = await createClient();
     const { data, error } = await supabase

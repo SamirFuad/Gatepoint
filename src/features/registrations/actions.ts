@@ -108,27 +108,19 @@ export async function submitPublicRegistrationAction(
   ]);
 
   if (eventResult.data) {
-    const registrationUrl = `${
-      process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-    }/public/events/${slug}`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const registrationUrl = `${appUrl}/public/events/${slug}`;
     const emailService = createEmailService();
 
     await emailService.sendRegistrationConfirmation({
       event: eventResult.data,
       registration: result.data,
       registrationUrl,
+      qrCode: qrResult.data ?? undefined,
+      checkInUrl: qrResult.data ? `${appUrl}/qr/${qrResult.data.code}` : undefined,
     });
 
-    if (qrResult.data) {
-      await emailService.sendQRCodeDelivery({
-        event: eventResult.data,
-        registration: result.data,
-        qrCode: qrResult.data,
-        checkInUrl: `${
-          process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-        }/qr/${qrResult.data.code}`,
-      });
-    } else if (qrResult.error) {
+    if (qrResult.error) {
       console.error(
         'Unable to generate registration QR code:',
         qrResult.error.message
@@ -136,11 +128,15 @@ export async function submitPublicRegistrationAction(
     }
   }
 
-  redirect(
-    `/public/events/${slug}/register/success?confirmation=${encodeURIComponent(
-      result.data.confirmationNumber
-    )}`
-  );
+  const searchParams = new URLSearchParams({
+    confirmation: result.data.confirmationNumber,
+  });
+
+  if (qrResult.data?.code) {
+    searchParams.set('qr', qrResult.data.code);
+  }
+
+  redirect(`/public/events/${slug}/register/success?${searchParams.toString()}`);
 }
 
 export async function updateRegistrationStatusAction(

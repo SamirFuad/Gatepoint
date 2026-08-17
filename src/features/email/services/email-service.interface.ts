@@ -12,6 +12,8 @@ export type RegistrationConfirmationEmailData = {
   event: Event;
   registration: Registration;
   registrationUrl: string;
+  qrCode?: QRCodeRecord;
+  checkInUrl?: string;
 };
 
 export type QRDeliveryEmailData = {

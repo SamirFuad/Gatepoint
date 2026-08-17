@@ -52,6 +52,8 @@ function renderRegistrationConfirmation(data: RegistrationConfirmationEmailData)
   const attendeeName = escapeHtml(data.registration.fullName);
   const confirmationNumber = escapeHtml(data.registration.confirmationNumber);
   const eventTime = escapeHtml(formatDate(data.event.startsAt));
+  const qrCode = data.qrCode ? escapeHtml(data.qrCode.code) : null;
+  const checkInUrl = data.checkInUrl ? escapeHtml(data.checkInUrl) : null;
 
   return renderShell(
     `You're registered for ${eventTitle}`,
@@ -62,10 +64,30 @@ function renderRegistrationConfirmation(data: RegistrationConfirmationEmailData)
         <p style="margin: 0 0 8px;"><strong>Confirmation number:</strong> ${confirmationNumber}</p>
         <p style="margin: 0;"><strong>Starts:</strong> ${eventTime}</p>
       </div>
+      ${
+        data.qrCode
+          ? `
+            <div style="background: #f4f4f5; border-radius: 8px; padding: 16px; margin: 20px 0; text-align: center;">
+              <p style="margin: 0 0 12px;"><strong>Your check-in QR code</strong></p>
+              ${
+                data.qrCode.qrImageUrl
+                  ? `<img src="${escapeHtml(data.qrCode.qrImageUrl)}" alt="QR code" width="220" height="220" style="display: inline-block;" />`
+                  : ''
+              }
+              <p style="font-family: monospace; margin: 12px 0 0;">${qrCode}</p>
+            </div>
+          `
+          : ''
+      }
       <p>
         <a href="${escapeHtml(data.registrationUrl)}" style="background: #2563eb; border-radius: 6px; color: #ffffff; display: inline-block; font-weight: 700; padding: 10px 14px; text-decoration: none;">
           View event details
         </a>
+        ${
+          checkInUrl
+            ? `<a href="${checkInUrl}" style="background: #18181b; border-radius: 6px; color: #ffffff; display: inline-block; font-weight: 700; margin-left: 8px; padding: 10px 14px; text-decoration: none;">View and download QR code</a>`
+            : ''
+        }
       </p>
     `
   );
@@ -105,6 +127,12 @@ function textRegistrationConfirmation(data: RegistrationConfirmationEmailData) {
     `Your registration for ${data.event.title} is confirmed.`,
     `Confirmation number: ${data.registration.confirmationNumber}`,
     `Starts: ${formatDate(data.event.startsAt)}`,
+    ...(data.qrCode
+      ? [
+          `QR code: ${data.qrCode.code}`,
+          `View and download QR code: ${data.checkInUrl ?? ''}`,
+        ]
+      : []),
     '',
     `Event details: ${data.registrationUrl}`,
   ].join('\n');

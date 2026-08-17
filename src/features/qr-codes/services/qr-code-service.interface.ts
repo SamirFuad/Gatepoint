@@ -21,6 +21,8 @@ export interface IQRCodeService {
     registrationId: string
   ): Promise<ApiResponse<QRCodeRecord>>;
 
+  getByCode(code: string): Promise<ApiResponse<QRCodeRecord>>;
+
   listByEvent(eventId: string): Promise<ApiResponse<QRCodeRecord[]>>;
 }
 
