@@ -4627,3 +4627,132 @@
     justify-content: flex-end;
   }
 }
+.account-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 4px 7px 4px 4px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  text-align: left;
+  color: var(--ink);
+  background: var(--paper);
+  cursor: pointer;
+}
+.account-trigger:hover {
+  background: var(--muted);
+}
+.account-trigger:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+.account-initials {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: var(--forest);
+  font-size: 11px;
+  font-weight: 600;
+}
+.account-identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.account-identity small {
+  font-size: 9px;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+.account-identity strong {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.account-menu[data-slot='dropdown-menu-content'] {
+  width: 250px;
+  max-width: calc(100vw - 30px);
+  padding: 8px;
+}
+.account-menu [data-slot='dropdown-menu-item'] {
+  min-height: 44px;
+  gap: 10px;
+  padding: 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.account-menu-name,
+.account-menu-email {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.account-menu-name {
+  font-size: 13px;
+  color: var(--foreground);
+  padding-top: 5px;
+}
+.account-menu-email {
+  font-size: 11px;
+  padding-block: 5px;
+}
+.workspace-header-actions .account-trigger {
+  flex-shrink: 0;
+}
+@media (max-width: 650px) {
+  .header-actions.has-account .header-cta {
+    display: none;
+  }
+  .header-actions.has-account {
+    gap: 7px;
+  }
+  .account-identity strong {
+    max-width: 90px;
+  }
+  .account-trigger {
+    gap: 6px;
+  }
+  .workspace-header-actions {
+    margin-left: auto;
+  }
+  .workspace-header-actions .account-identity strong {
+    max-width: 80px;
+  }
+}
+.account-identity strong {
+  font-size: 12px;
+}
+.account-identity small {
+  font-size: 10px;
+}
+@media (max-width: 650px) {
+  .workspace-breadcrumb {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+  .workspace-breadcrumb > span {
+    display: none !important;
+  }
+  .workspace-breadcrumb > span:last-child {
+    display: inline-flex !important;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .workspace-header {
+    gap: 10px;
+  }
+  .workspace-header-actions .account-identity strong {
+    max-width: 80px;
+  }
+}

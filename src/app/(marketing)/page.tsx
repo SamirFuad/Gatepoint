@@ -1,3 +1,4 @@
+import { CreateEventLink } from '@/components/events/create-event-link';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -88,9 +89,9 @@ export default function HomePage() {
             registration, guests, and event experience together with Gatepoint.
           </p>
           <div className="hero-actions">
-            <Link href="/register" className="gp-button gp-button-dark">
+            <CreateEventLink className="gp-button gp-button-dark">
               Create your event <ArrowUpRight size={18} />
-            </Link>
+            </CreateEventLink>
             <Link href="#features" className="hero-secondary">
               Meet your platform <ArrowDown size={16} />
             </Link>
@@ -232,9 +233,9 @@ export default function HomePage() {
             <span>
               On-site services are arranged separately for your event.
             </span>
-            <Link href="/register">
+            <CreateEventLink>
               Start with your event <ArrowUpRight size={17} />
-            </Link>
+            </CreateEventLink>
           </div>
         </div>
       </section>
@@ -249,9 +250,9 @@ export default function HomePage() {
             to <span>“welcome in.”</span>
           </h2>
           <p>Big ideas deserve a simple beginning.</p>
-          <Link href="/register" className="text-link">
+          <CreateEventLink className="text-link">
             Let’s make it happen <ArrowUpRight size={18} />
-          </Link>
+          </CreateEventLink>
         </div>
         <div className="workflow-steps">
           {steps.map((step, i) => (
@@ -296,9 +297,9 @@ export default function HomePage() {
               starts at the gate.
             </h2>
             <p>Your next gathering is waiting to happen.</p>
-            <Link href="/register" className="gp-button gp-button-dark">
+            <CreateEventLink className="gp-button gp-button-dark">
               Create your event <ArrowUpRight size={18} />
-            </Link>
+            </CreateEventLink>
           </div>
           <MoveUpRight
             className="cta-arrow"

@@ -12,8 +12,9 @@
 // The file is proxy.ts and exports a function named "proxy".
 // =============================================================
 
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
+import { redirectWithSession } from '@/lib/supabase/session-response';
 
 // Routes that require authentication
 const PROTECTED_ROUTES = [
@@ -68,7 +69,7 @@ export async function proxy(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = '/login';
       url.searchParams.set('redirectTo', pathname);
-      return NextResponse.redirect(url);
+      return redirectWithSession(url, supabaseResponse);
     }
 
     // User is authenticated → allow access
@@ -81,7 +82,7 @@ export async function proxy(request: NextRequest) {
       // Already authenticated → redirect to dashboard
       const url = request.nextUrl.clone();
       url.pathname = '/dashboard';
-      return NextResponse.redirect(url);
+      return redirectWithSession(url, supabaseResponse);
     }
 
     // Not authenticated → allow access to auth pages

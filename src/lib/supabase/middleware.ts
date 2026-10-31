@@ -32,28 +32,31 @@ export async function updateSession(request: NextRequest) {
     return { supabaseResponse, user: null };
   }
 
-  const supabase = createServerClient<Database>(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
+  const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet, headers) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value)
+        );
+        const previous = supabaseResponse;
+        supabaseResponse = NextResponse.next({
+          request,
+        });
+        previous.cookies
+          .getAll()
+          .forEach((cookie) => supabaseResponse.cookies.set(cookie));
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        );
+        Object.entries(headers).forEach(([name, value]) =>
+          supabaseResponse.headers.set(name, value)
+        );
+      },
+    },
+  });
 
   // IMPORTANT: Do NOT use getSession() here.
   // getSession() reads from cookies which could be tampered with.
@@ -61,6 +64,12 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (user)
+    supabaseResponse.headers.set(
+      'Cache-Control',
+      'private, no-store, max-age=0'
+    );
 
   return { supabaseResponse, user };
 }

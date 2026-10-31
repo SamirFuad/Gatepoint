@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryProvider, ToastProvider } from '@/components/providers';
 import './globals.css';
+import { AuthProvider } from '@/components/providers/auth-provider';
+import { createClient } from '@/lib/supabase/server';
+import { authProfile } from '@/features/auth/lib/auth-profile';
 
 export const metadata: Metadata = {
   title: {
@@ -33,11 +36,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return (
     <html
       lang="en"
@@ -46,12 +53,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <QueryProvider>
-          <TooltipProvider>
-            {children}
-            <ToastProvider />
-          </TooltipProvider>
-        </QueryProvider>
+        <AuthProvider
+          key={user?.id ?? 'anonymous'}
+          initialUser={user ? authProfile(user) : null}
+        >
+          <QueryProvider>
+            <TooltipProvider>
+              {children}
+              <ToastProvider />
+            </TooltipProvider>
+          </QueryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { authProfile as toAuthUser } from '../lib/auth-profile';
 import type { ApiError, ApiResponse } from '@/types';
 import type {
   AuthUser,
@@ -20,32 +21,15 @@ function appUrl() {
   return process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 }
 
-function toApiError(error: { message: string; code?: string; status?: number }): ApiError {
+function toApiError(error: {
+  message: string;
+  code?: string;
+  status?: number;
+}): ApiError {
   return {
     message: error.message,
     code: error.code,
     status: error.status,
-  };
-}
-
-function toAuthUser(user: {
-  id: string;
-  email?: string;
-  user_metadata?: Record<string, unknown>;
-  email_confirmed_at?: string | null;
-}): AuthUser {
-  return {
-    id: user.id,
-    email: user.email ?? '',
-    fullName:
-      typeof user.user_metadata?.full_name === 'string'
-        ? user.user_metadata.full_name
-        : null,
-    avatarUrl:
-      typeof user.user_metadata?.avatar_url === 'string'
-        ? user.user_metadata.avatar_url
-        : null,
-    emailVerified: Boolean(user.email_confirmed_at),
   };
 }
 
@@ -77,9 +61,7 @@ export class SupabaseAuthService implements IAuthService {
     return { data: toAuthUser(authData.user), error: null };
   }
 
-  async login(
-    credentials: LoginCredentials
-  ): Promise<ApiResponse<AuthUser>> {
+  async login(credentials: LoginCredentials): Promise<ApiResponse<AuthUser>> {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signInWithPassword({
       email: credentials.email,
@@ -184,4 +166,3 @@ export class SupabaseAuthService implements IAuthService {
 export function createAuthService(): IAuthService {
   return new SupabaseAuthService();
 }
-

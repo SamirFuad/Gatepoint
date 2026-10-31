@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { logoutAction } from '@/features/auth/actions';
 import { Brand } from '@/components/brand';
+import { AccountMenu } from './account-menu';
 import {
   Sheet,
   SheetContent,
@@ -187,6 +188,7 @@ export function DashboardShell({
             ))}
           </div>
           <div className="workspace-header-actions">
+            <AccountMenu />
             <Link href="/public/events">
               Explore events <ArrowUpRight size={14} />
             </Link>

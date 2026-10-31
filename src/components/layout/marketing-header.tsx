@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { Brand } from '@/components/brand';
+import { AccountMenu } from './account-menu';
+import { useAuthUser } from '@/components/providers/auth-provider';
 const links = [
   { label: 'The platform', href: '/#features' },
   { label: 'Event services', href: '/#services' },
@@ -10,6 +12,7 @@ const links = [
   { label: 'Explore events', href: '/public/events' },
 ];
 export function MarketingHeader() {
+  const user = useAuthUser();
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   return (
@@ -33,13 +36,17 @@ export function MarketingHeader() {
             </Link>
           ))}
         </nav>
-        <div className="header-actions">
-          <Link className="sign-in-link" href="/login">
-            Sign in
-          </Link>
+        <div className={'header-actions' + (user ? ' has-account' : '')}>
+          {user ? (
+            <AccountMenu />
+          ) : (
+            <Link className="sign-in-link" href="/login">
+              Sign in
+            </Link>
+          )}
           <Link
             className="gp-button gp-button-dark header-cta"
-            href="/register"
+            href={user ? '/events/new' : '/register'}
           >
             Create an event <ArrowUpRight size={16} />
           </Link>
@@ -72,10 +79,16 @@ export function MarketingHeader() {
               <ArrowUpRight size={16} />
             </Link>
           ))}
-          <Link href="/login" onClick={() => setOpen(false)}>
-            Sign in
+          <Link
+            href={user ? '/dashboard' : '/login'}
+            onClick={() => setOpen(false)}
+          >
+            {user ? 'My workspace' : 'Sign in'}
           </Link>
-          <Link href="/register" onClick={() => setOpen(false)}>
+          <Link
+            href={user ? '/events/new' : '/register'}
+            onClick={() => setOpen(false)}
+          >
             Create an event
           </Link>
         </nav>

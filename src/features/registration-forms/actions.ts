@@ -18,6 +18,11 @@ export type RegistrationFormActionState = {
 
 const initialError = 'Something went wrong. Please try again.';
 
+function revalidateRegistrationForm(eventId: string) {
+  revalidatePath(`/events/${eventId}/registrations`);
+  revalidatePath('/public/events/[slug]/register', 'page');
+}
+
 async function getEvent(eventId: string) {
   const eventService = createEventService();
   const result = await eventService.getById(eventId);
@@ -64,7 +69,7 @@ export async function upsertRegistrationFormAction(
     return { message: result.error.message || initialError };
   }
 
-  revalidatePath(`/events/${eventId}/registrations`);
+  revalidateRegistrationForm(eventId);
   return { success: true, message: 'Registration form saved.' };
 }
 
@@ -105,7 +110,7 @@ export async function addFormFieldAction(
     return { message: result.error.message || initialError };
   }
 
-  revalidatePath(`/events/${eventId}/registrations`);
+  revalidateRegistrationForm(eventId);
   return { success: true, message: 'Field added.' };
 }
 
@@ -146,7 +151,7 @@ export async function updateFormFieldAction(
     return { message: result.error.message || initialError };
   }
 
-  revalidatePath(`/events/${eventId}/registrations`);
+  revalidateRegistrationForm(eventId);
   return { success: true, message: 'Field updated.' };
 }
 
@@ -170,7 +175,6 @@ export async function deleteFormFieldAction(
     return { message: result.error.message || initialError };
   }
 
-  revalidatePath(`/events/${eventId}/registrations`);
+  revalidateRegistrationForm(eventId);
   return { success: true, message: 'Field deleted.' };
 }
-

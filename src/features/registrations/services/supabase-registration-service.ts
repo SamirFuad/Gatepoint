@@ -1,6 +1,10 @@
 import { customAlphabet } from 'nanoid';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import {
+  insertRegistration,
+  registrationPhone,
+} from '../lib/registration-insert';
 import type {
   ApiError,
   ApiResponse,
@@ -21,7 +25,10 @@ type RegistrationRow = Database['public']['Tables']['registrations']['Row'];
 type RegistrationResponseRow =
   Database['public']['Tables']['registration_responses']['Row'];
 
-const confirmationAlphabet = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 8);
+const confirmationAlphabet = customAlphabet(
+  'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+  8
+);
 
 function toApiError(error: {
   message: string;
@@ -49,7 +56,7 @@ function toRegistration(row: RegistrationRow): Registration {
     formId: row.form_id,
     confirmationNumber: row.confirmation_number,
     email: row.email,
-    phone: row.phone,
+    phone: registrationPhone(row),
     fullName: row.full_name,
     status: row.status,
     metadata: toObject(row.metadata),
@@ -92,20 +99,13 @@ export class SupabaseRegistrationService implements IRegistrationService {
       };
     }
 
-    const { data: registration, error } = await supabase
-      .from('registrations')
-      .insert({
-        event_id: data.eventId,
-        organization_id: data.organizationId,
-        form_id: data.formId,
-        confirmation_number: createConfirmationNumber(),
-        email: data.email,
-        phone: data.phone ?? null,
-        full_name: data.fullName,
-        status: 'confirmed',
-      })
-      .select()
-      .single();
+    const { data: registration, error } =
+      await insertRegistration<RegistrationRow>(
+        (payload) =>
+          supabase.from('registrations').insert(payload).select().single(),
+        data,
+        createConfirmationNumber()
+      );
 
     if (error) {
       if (error.code === '23505') {
@@ -121,6 +121,14 @@ export class SupabaseRegistrationService implements IRegistrationService {
 
       return { data: null, error: toApiError(error) };
     }
+
+    if (!registration)
+      return {
+        data: null,
+        error: {
+          message: 'Unable to complete registration. Please try again.',
+        },
+      };
 
     const responsesToInsert = data.responses.map((response) => ({
       registration_id: registration.id,
@@ -221,9 +229,7 @@ export class SupabaseRegistrationService implements IRegistrationService {
     };
   }
 
-  async listAllByEvent(
-    eventId: string
-  ): Promise<ApiResponse<Registration[]>> {
+  async listAllByEvent(eventId: string): Promise<ApiResponse<Registration[]>> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('registrations')
@@ -248,7 +254,8 @@ export class SupabaseRegistrationService implements IRegistrationService {
       .update({
         status,
         cancelled_at: status === 'cancelled' ? new Date().toISOString() : null,
-        checked_in_at: status === 'checked_in' ? new Date().toISOString() : null,
+        checked_in_at:
+          status === 'checked_in' ? new Date().toISOString() : null,
       })
       .eq('id', id)
       .select()
@@ -265,4 +272,3 @@ export class SupabaseRegistrationService implements IRegistrationService {
 export function createRegistrationService(): IRegistrationService {
   return new SupabaseRegistrationService();
 }
-

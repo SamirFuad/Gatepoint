@@ -1,7 +1,7 @@
 'use client';
+import { CreateEventLink } from '@/components/events/create-event-link';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import {
   ArrowUpRight,
   Check,
@@ -90,9 +90,9 @@ export function PlatformPreview() {
         >
           <h3>{view.title}</h3>
           <p>{view.description}</p>
-          <Link href="/register" className="text-link">
+          <CreateEventLink className="text-link">
             Build your first event <ArrowUpRight size={18} />
-          </Link>
+          </CreateEventLink>
         </div>
       </div>
       <div
@@ -124,9 +124,9 @@ export function PlatformPreview() {
                 <span>Email address</span>
                 <span>you@example.com</span>
               </div>
-              <Link href="/register" className="gp-button gp-button-dark">
+              <CreateEventLink className="gp-button gp-button-dark">
                 Create your own registration <ArrowUpRight size={16} />
-              </Link>
+              </CreateEventLink>
             </div>
           </div>
         )}
@@ -173,9 +173,9 @@ export function PlatformPreview() {
                 <span>Organized</span>
               </div>
             ))}
-            <Link href="/register" className="text-link">
+            <CreateEventLink className="text-link">
               Bring your event together <ArrowUpRight size={16} />
-            </Link>
+            </CreateEventLink>
           </div>
         )}
       </div>
