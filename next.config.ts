@@ -1,29 +1,30 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  output: 'standalone',
   poweredByHeader: false,
+  experimental: { serverActions: { bodySizeLimit: '6mb' } },
   async headers() {
     return [
       {
-        source: "/:path*",
+        source: '/:path*',
         headers: [
           {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
           },
           {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
-            key: "Referrer-Policy",
-            value: "origin-when-cross-origin",
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
           },
           {
-            key: "Permissions-Policy",
+            key: 'Permissions-Policy',
             value:
-              "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+              'camera=(), microphone=(), geolocation=(), browsing-topics=()',
           },
         ],
       },

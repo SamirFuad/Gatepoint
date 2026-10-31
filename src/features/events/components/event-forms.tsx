@@ -20,15 +20,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { localEventDateTime } from '../lib/event-dates';
 
 const initialState: EventActionState = {};
 
-function toLocalDateTime(value: string | null) {
+function toLocalDateTime(
+  value: string | null,
+  timeZone = 'Africa/Addis_Ababa'
+) {
   if (!value) {
     return '';
   }
 
-  return new Date(value).toISOString().slice(0, 16);
+  return localEventDateTime(value, timeZone);
 }
 
 function FieldError({ errors }: { errors?: string[] }) {
@@ -138,7 +142,10 @@ function EventFields({
             id="startsAt"
             name="startsAt"
             type="datetime-local"
-            defaultValue={toLocalDateTime(event?.startsAt ?? null)}
+            defaultValue={toLocalDateTime(
+              event?.startsAt ?? null,
+              event?.timezone
+            )}
           />
           <FieldError errors={state.errors?.startsAt} />
         </div>
@@ -148,7 +155,10 @@ function EventFields({
             id="endsAt"
             name="endsAt"
             type="datetime-local"
-            defaultValue={toLocalDateTime(event?.endsAt ?? null)}
+            defaultValue={toLocalDateTime(
+              event?.endsAt ?? null,
+              event?.timezone
+            )}
           />
           <FieldError errors={state.errors?.endsAt} />
         </div>
@@ -160,7 +170,10 @@ function EventFields({
             id="registrationOpensAt"
             name="registrationOpensAt"
             type="datetime-local"
-            defaultValue={toLocalDateTime(event?.registrationOpensAt ?? null)}
+            defaultValue={toLocalDateTime(
+              event?.registrationOpensAt ?? null,
+              event?.timezone
+            )}
           />
           <FieldError errors={state.errors?.registrationOpensAt} />
         </div>
@@ -170,7 +183,10 @@ function EventFields({
             id="registrationClosesAt"
             name="registrationClosesAt"
             type="datetime-local"
-            defaultValue={toLocalDateTime(event?.registrationClosesAt ?? null)}
+            defaultValue={toLocalDateTime(
+              event?.registrationClosesAt ?? null,
+              event?.timezone
+            )}
           />
           <FieldError errors={state.errors?.registrationClosesAt} />
         </div>
@@ -181,7 +197,7 @@ function EventFields({
           <Input
             id="timezone"
             name="timezone"
-            defaultValue={event?.timezone ?? 'UTC'}
+            defaultValue={event?.timezone ?? 'Africa/Addis_Ababa'}
           />
           <FieldError errors={state.errors?.timezone} />
         </div>
@@ -250,10 +266,7 @@ export function CreateEventForm() {
 
 export function EventSettingsForm({ event }: { event: Event }) {
   const updateAction = updateEventAction.bind(null, event.id);
-  const [state, action, pending] = useActionState(
-    updateAction,
-    initialState
-  );
+  const [state, action, pending] = useActionState(updateAction, initialState);
 
   return (
     <Card>
@@ -275,4 +288,3 @@ export function EventSettingsForm({ event }: { event: Event }) {
     </Card>
   );
 }
-

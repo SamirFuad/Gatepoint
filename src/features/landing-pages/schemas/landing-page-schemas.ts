@@ -1,5 +1,21 @@
 import { z } from 'zod';
 
+export const eventImageSchema = z.object({
+  url: z
+    .string()
+    .max(2048)
+    .refine(
+      (value) => value.startsWith('/images/') || /^https:\/\//.test(value),
+      'Choose an uploaded image.'
+    ),
+  alt: z
+    .string()
+    .trim()
+    .max(180, 'Image description must be 180 characters or fewer.')
+    .default(''),
+});
+export type EventImage = z.infer<typeof eventImageSchema>;
+
 export const agendaItemSchema = z.object({
   time: z
     .string()
@@ -42,7 +58,7 @@ export const landingPageConfigSchema = z.object({
   accentColor: z
     .string()
     .trim()
-    .regex(/^#[0-9a-fA-F]{6}$/, 'Use a hex color like #4f46e5.'),
+    .regex(/^#[0-9a-fA-F]{6}$/, 'Use a hex color like #294d3c.'),
   agenda: z
     .string()
     .trim()
@@ -62,18 +78,27 @@ export const landingPageConfigSchema = z.object({
     .optional()
     .or(z.literal('')),
   agendaItems: z.array(agendaItemSchema).optional(),
+  coverImage: eventImageSchema.nullish().default(null),
+  galleryImages: z
+    .array(eventImageSchema)
+    .max(6, 'Add up to six gallery images.')
+    .default([]),
 });
 
 export type LandingPageConfig = z.infer<typeof landingPageConfigSchema>;
 
-export function defaultLandingPageConfig(eventTitle: string): LandingPageConfig {
+export function defaultLandingPageConfig(
+  eventTitle: string
+): LandingPageConfig {
   return {
     headline: eventTitle,
     subheadline: 'Reserve your place and receive event updates.',
-    accentColor: '#4f46e5',
+    accentColor: '#294d3c',
     agenda: '',
     venueNote: '',
     contactEmail: '',
     agendaItems: [],
+    coverImage: null,
+    galleryImages: [],
   };
 }

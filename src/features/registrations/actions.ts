@@ -7,6 +7,7 @@ import { createEventService } from '@/features/events/services/supabase-event-se
 import { createQRCodeService } from '@/features/qr-codes/services/supabase-qr-code-service';
 import { createRegistrationFormService } from '@/features/registration-forms/services/supabase-registration-form-service';
 import { FIELD_TYPES } from '@/lib/constants';
+import { registrationUnavailable } from './lib/registration-availability';
 import { createRegistrationService } from './services/supabase-registration-service';
 import {
   publicRegistrationSchema,
@@ -68,10 +69,20 @@ export async function submitPublicRegistrationAction(
     return { errors: parsed.error.flatten().fieldErrors };
   }
 
+  const eventCheck = await createEventService().getBySlug(slug);
+  if (
+    eventCheck.error ||
+    !eventCheck.data ||
+    eventCheck.data.id !== parsed.data.eventId
+  )
+    return { message: 'This event is not available for registration.' };
+  const unavailable = registrationUnavailable(eventCheck.data);
+  if (unavailable) return { message: unavailable };
+
   const formService = createRegistrationFormService();
   const formResult = await formService.getByEventId(parsed.data.eventId);
 
-  if (formResult.error || !formResult.data) {
+  if (formResult.error || !formResult.data || !formResult.data.isActive) {
     return { message: 'Registration form is not available.' };
   }
 
@@ -142,11 +153,16 @@ export async function submitPublicRegistrationAction(
       registration: result.data,
       registrationUrl,
       qrCode: qrResult.data ?? undefined,
-      checkInUrl: qrResult.data ? `${appUrl}/qr/${qrResult.data.code}` : undefined,
+      checkInUrl: qrResult.data
+        ? `${appUrl}/qr/${qrResult.data.code}`
+        : undefined,
     });
 
     if (emailResult.error) {
-      console.error('Unable to send registration email:', emailResult.error.message);
+      console.error(
+        'Unable to send registration email:',
+        emailResult.error.message
+      );
       emailFailed = true;
     }
 
@@ -172,7 +188,9 @@ export async function submitPublicRegistrationAction(
     searchParams.set('qr', qrResult.data.code);
   }
 
-  redirect(`/public/events/${slug}/register/success?${searchParams.toString()}`);
+  redirect(
+    `/public/events/${slug}/register/success?${searchParams.toString()}`
+  );
 }
 
 export async function updateRegistrationStatusAction(

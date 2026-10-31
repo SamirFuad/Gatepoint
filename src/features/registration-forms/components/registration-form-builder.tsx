@@ -26,6 +26,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ConfirmSubmit } from '@/components/common/confirm-submit';
 
 const initialState: RegistrationFormActionState = {};
 
@@ -59,14 +60,11 @@ function fieldTypeNeedsOptions(fieldType: string) {
   return ['select', 'multi_select', 'checkbox', 'radio'].includes(fieldType);
 }
 
-function FieldTypeSelect({
-  defaultValue,
-}: {
-  defaultValue?: string;
-}) {
+function FieldTypeSelect({ defaultValue }: { defaultValue?: string }) {
   return (
     <select
       name="fieldType"
+      aria-label="Question type"
       defaultValue={defaultValue ?? FIELD_TYPES.TEXT}
       className="h-9 w-full rounded-lg border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
     >
@@ -89,10 +87,7 @@ export function RegistrationFormSettings({
   form: RegistrationFormWithFields | null;
 }) {
   const actionForEvent = upsertRegistrationFormAction.bind(null, eventId);
-  const [state, action, pending] = useActionState(
-    actionForEvent,
-    initialState
-  );
+  const [state, action, pending] = useActionState(actionForEvent, initialState);
 
   return (
     <Card>
@@ -147,10 +142,7 @@ export function AddFieldForm({
   nextSortOrder: number;
 }) {
   const actionForEvent = addFormFieldAction.bind(null, eventId);
-  const [state, action, pending] = useActionState(
-    actionForEvent,
-    initialState
-  );
+  const [state, action, pending] = useActionState(actionForEvent, initialState);
 
   return (
     <Card>
@@ -245,9 +237,14 @@ export function FormFieldsEditor({
                   <input type="hidden" name="fieldId" value={field.id} />
                   <div className="grid gap-3 md:grid-cols-[160px_1fr_100px]">
                     <FieldTypeSelect defaultValue={field.fieldType} />
-                    <Input name="label" defaultValue={field.label} />
+                    <Input
+                      name="label"
+                      defaultValue={field.label}
+                      aria-label="Question label"
+                    />
                     <Input
                       name="sortOrder"
+                      aria-label="Question order"
                       type="number"
                       min="0"
                       defaultValue={field.sortOrder}
@@ -255,12 +252,14 @@ export function FormFieldsEditor({
                   </div>
                   <Input
                     name="placeholder"
+                    aria-label="Question placeholder"
                     defaultValue={field.placeholder ?? ''}
                     placeholder="Placeholder"
                   />
                   {fieldTypeNeedsOptions(field.fieldType) ? (
                     <Textarea
                       name="optionsText"
+                      aria-label="Question options, one per line"
                       defaultValue={field.options.join('\n')}
                     />
                   ) : (
@@ -291,15 +290,15 @@ export function FormFieldsEditor({
                 </form>
                 <form action={deleteAction} className="mt-3">
                   <input type="hidden" name="fieldId" value={field.id} />
-                  <Button
-                    type="submit"
-                    variant="destructive"
-                    size="sm"
+                  <ConfirmSubmit
+                    title="Remove this question?"
+                    description="This question will no longer appear on the registration form. Review your existing attendee data before changing a live form."
+                    confirmLabel="Remove question"
                     disabled={deletePending}
                   >
                     <Trash2 />
                     Delete
-                  </Button>
+                  </ConfirmSubmit>
                 </form>
               </div>
             ))}
@@ -330,6 +329,14 @@ export function RegistrationFormPreview({
             {form?.description ?? 'Registration form preview.'}
           </p>
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="preview-full-name">Full name</Label>
+          <Input id="preview-full-name" placeholder="Selam Tesfaye" disabled />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="preview-email">Email address</Label>
+          <Input id="preview-email" placeholder="you@example.com" disabled />
+        </div>
         {(form?.fields ?? []).map((field) => (
           <div key={field.id} className="space-y-2">
             <Label>
@@ -352,15 +359,19 @@ export function RegistrationFormPreview({
               </select>
             ) : (
               <Input
-                type={field.fieldType === FIELD_TYPES.NUMBER ? 'number' : 'text'}
+                type={
+                  field.fieldType === FIELD_TYPES.NUMBER ? 'number' : 'text'
+                }
                 placeholder={field.placeholder ?? ''}
                 disabled
               />
             )}
           </div>
         ))}
+        <Button disabled className="w-full" type="button">
+          Complete registration
+        </Button>
       </CardContent>
     </Card>
   );
 }
-

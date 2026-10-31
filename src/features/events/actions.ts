@@ -5,7 +5,12 @@ import { redirect } from 'next/navigation';
 import { createOrganizationService } from '@/features/organizations/services/supabase-organization-service';
 import { createClient } from '@/lib/supabase/server';
 import { createEventService } from './services/supabase-event-service';
-import { eventIdSchema, eventSchema, updateEventSchema } from './schemas/event-schemas';
+import {
+  eventIdSchema,
+  eventSchema,
+  updateEventSchema,
+} from './schemas/event-schemas';
+import { eventDateTimeToIso } from './lib/event-dates';
 
 export type EventActionState = {
   errors?: Record<string, string[] | undefined>;
@@ -15,12 +20,33 @@ export type EventActionState = {
 
 const initialError = 'Something went wrong. Please try again.';
 
-function optionalIsoDate(value?: string | number) {
+function optionalIsoDate(value: string | number | undefined, timeZone: string) {
   if (!value || typeof value !== 'string') {
     return undefined;
   }
 
-  return new Date(value).toISOString();
+  return eventDateTimeToIso(value, timeZone);
+}
+
+function eventSchedule(data: {
+  startsAt: string;
+  endsAt: string;
+  timezone: string;
+  registrationOpensAt?: string | number;
+  registrationClosesAt?: string | number;
+}) {
+  return {
+    startsAt: eventDateTimeToIso(data.startsAt, data.timezone),
+    endsAt: eventDateTimeToIso(data.endsAt, data.timezone),
+    registrationOpensAt: optionalIsoDate(
+      data.registrationOpensAt,
+      data.timezone
+    ),
+    registrationClosesAt: optionalIsoDate(
+      data.registrationClosesAt,
+      data.timezone
+    ),
+  };
 }
 
 async function getCurrentOrganizationId() {
@@ -98,6 +124,15 @@ export async function createEventAction(
   }
 
   const service = createEventService();
+  let schedule: ReturnType<typeof eventSchedule>;
+  try {
+    schedule = eventSchedule(parsed.data);
+  } catch {
+    return {
+      message:
+        'Check the dates and timezone. Enter a valid local time for each date.',
+    };
+  }
   const result = await service.create(organizationId, {
     title: parsed.data.title,
     slug: parsed.data.slug || undefined,
@@ -106,10 +141,7 @@ export async function createEventAction(
     venueName: parsed.data.venueName || undefined,
     venueAddress: parsed.data.venueAddress || undefined,
     timezone: parsed.data.timezone,
-    startsAt: new Date(parsed.data.startsAt).toISOString(),
-    endsAt: new Date(parsed.data.endsAt).toISOString(),
-    registrationOpensAt: optionalIsoDate(parsed.data.registrationOpensAt),
-    registrationClosesAt: optionalIsoDate(parsed.data.registrationClosesAt),
+    ...schedule,
     maxAttendees:
       typeof parsed.data.maxAttendees === 'number'
         ? parsed.data.maxAttendees
@@ -155,6 +187,15 @@ export async function updateEventAction(
   }
 
   const service = createEventService();
+  let schedule: ReturnType<typeof eventSchedule>;
+  try {
+    schedule = eventSchedule(parsed.data);
+  } catch {
+    return {
+      message:
+        'Check the dates and timezone. Enter a valid local time for each date.',
+    };
+  }
   const result = await service.update(id.data.eventId, {
     title: parsed.data.title,
     slug: parsed.data.slug || undefined,
@@ -164,11 +205,9 @@ export async function updateEventAction(
     venueName: parsed.data.venueName || null,
     venueAddress: parsed.data.venueAddress || null,
     timezone: parsed.data.timezone,
-    startsAt: new Date(parsed.data.startsAt).toISOString(),
-    endsAt: new Date(parsed.data.endsAt).toISOString(),
-    registrationOpensAt: optionalIsoDate(parsed.data.registrationOpensAt) ?? null,
-    registrationClosesAt:
-      optionalIsoDate(parsed.data.registrationClosesAt) ?? null,
+    ...schedule,
+    registrationOpensAt: schedule.registrationOpensAt ?? null,
+    registrationClosesAt: schedule.registrationClosesAt ?? null,
     maxAttendees:
       typeof parsed.data.maxAttendees === 'number'
         ? parsed.data.maxAttendees
@@ -185,30 +224,43 @@ export async function updateEventAction(
   return { success: true, message: 'Event updated.' };
 }
 
-export async function publishEventAction(formData: FormData) {
+export async function publishEventAction(
+  formData: FormData
+): Promise<EventActionState> {
   const id = eventIdSchema.safeParse({ eventId: formData.get('eventId') });
 
   if (!id.success) {
-    return;
+    return { message: 'This event could not be found.' };
   }
 
   const service = createEventService();
-  await service.publish(id.data.eventId);
+  const result = await service.publish(id.data.eventId);
+  if (result.error) return { message: result.error.message };
   revalidatePath('/events');
   revalidatePath(`/events/${id.data.eventId}`);
+  revalidatePath('/public/events');
+  return {
+    success: true,
+    message: 'Your event is published and ready to share.',
+  };
 }
 
-export async function cancelEventAction(formData: FormData) {
+export async function cancelEventAction(
+  formData: FormData
+): Promise<EventActionState> {
   const id = eventIdSchema.safeParse({ eventId: formData.get('eventId') });
 
   if (!id.success) {
-    return;
+    return { message: 'This event could not be found.' };
   }
 
   const service = createEventService();
-  await service.cancel(id.data.eventId);
+  const result = await service.cancel(id.data.eventId);
+  if (result.error) return { message: result.error.message };
   revalidatePath('/events');
   revalidatePath(`/events/${id.data.eventId}`);
+  revalidatePath('/public/events');
+  return { success: true, message: 'Your event has been cancelled.' };
 }
 
 export async function deleteEventAction(formData: FormData) {
@@ -223,4 +275,3 @@ export async function deleteEventAction(formData: FormData) {
   revalidatePath('/events');
   redirect('/events');
 }
-

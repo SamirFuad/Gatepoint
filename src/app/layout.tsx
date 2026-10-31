@@ -5,11 +5,11 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Gatepoint — Event Registration Platform',
+    default: 'Gatepoint — Great Events. Real Connection.',
     template: '%s | Gatepoint',
   },
   description:
-    'Cloud-based event registration platform for conferences, workshops, and corporate events. Create events, manage registrations, and deliver QR codes.',
+    'Bring registration, guests, and your event experience together. Event registration, QR passes, badging, and on-site event technology in Ethiopia.',
   keywords: [
     'event registration',
     'event management',
@@ -17,12 +17,13 @@ export const metadata: Metadata = {
     'QR check-in',
     'attendee management',
   ],
+  icons: { icon: '/icon.svg', shortcut: '/icon.svg' },
   authors: [{ name: 'Gatepoint' }],
   openGraph: {
     type: 'website',
     locale: 'en_US',
     siteName: 'Gatepoint',
-    title: 'Gatepoint — Event Registration Platform',
+    title: 'Gatepoint — Great Events. Real Connection.',
     description:
       'Cloud-based event registration platform for conferences, workshops, and corporate events.',
   },
@@ -40,6 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className="h-full antialiased"
       suppressHydrationWarning
     >

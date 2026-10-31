@@ -1,35 +1,55 @@
-// =============================================================
-// Gatepoint — Auth Layout
-// =============================================================
-// Layout for authentication pages (login, register, etc.)
-// Centered card design with no header/footer.
-// =============================================================
-
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-
+import { Brand } from '@/components/brand';
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-screen items-center justify-center hero-bg p-4">
-      {/* Soft pulsing radial glow */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/[0.04] blur-3xl animate-pulse" />
-      </div>
-
-      {/* Back to home */}
-      <Link
-        href="/"
-        className="absolute left-4 top-4 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground sm:left-6 sm:top-6"
-      >
-        <ArrowLeft className="size-4" />
-        Back to home
-      </Link>
-
-      <div className="relative w-full max-w-md">{children}</div>
+    <div className="auth-layout">
+      <aside className="auth-story">
+        <Link href="/" aria-label="Gatepoint home">
+          <Brand />
+        </Link>
+        <div className="auth-story-copy">
+          <h1>
+            A great gathering
+            <br />
+            starts with
+            <br />
+            <span>a simple hello.</span>
+          </h1>
+          <p>
+            One place for your events, your guests, and every detail that brings
+            them together.
+          </p>
+        </div>
+        <div className="auth-story-image">
+          <Image
+            src="/images/addis-conference.jpg"
+            alt="A gathering at the United Nations conference hall in Addis Ababa"
+            fill
+            sizes="50vw"
+            priority
+          />
+        </div>
+        <div className="auth-story-footer">
+          <span>Gatepoint Digital Solutions</span>
+          <span>Addis Ababa, Ethiopia</span>
+        </div>
+      </aside>
+      <main className="auth-content">
+        <Link href="/" className="auth-back">
+          <ArrowLeft size={15} />
+          Back to home
+        </Link>
+        <div className="auth-form-wrap">{children}</div>
+        <p className="auth-privacy">
+          Thoughtfully built for the people who bring people together.
+        </p>
+      </main>
     </div>
   );
 }

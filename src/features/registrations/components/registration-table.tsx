@@ -8,6 +8,8 @@ import {
 } from '../actions';
 import type { Registration } from '../services/registration-service.interface';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/common/empty-state';
+import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -53,10 +55,7 @@ export function RegistrationTable({
   registrations: Registration[];
 }) {
   const actionForEvent = updateRegistrationStatusAction.bind(null, eventId);
-  const [state, action, pending] = useActionState(
-    actionForEvent,
-    initialState
-  );
+  const [state, action, pending] = useActionState(actionForEvent, initialState);
 
   return (
     <Card>
@@ -68,61 +67,71 @@ export function RegistrationTable({
       </CardHeader>
       <CardContent className="space-y-4">
         <FormMessage state={state} />
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Attendee</TableHead>
-              <TableHead>Confirmation</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Registered</TableHead>
-              <TableHead className="w-56">Update</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {registrations.map((registration) => (
-              <TableRow key={registration.id}>
-                <TableCell>
-                  <div className="font-medium">{registration.fullName}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {registration.email}
-                  </div>
-                </TableCell>
-                <TableCell>{registration.confirmationNumber}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary">{registration.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  {new Date(registration.registeredAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <form action={action} className="flex items-center gap-2">
-                    <input
-                      type="hidden"
-                      name="registrationId"
-                      value={registration.id}
-                    />
-                    <select
-                      name="status"
-                      defaultValue={registration.status}
-                      className="h-8 rounded-lg border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                    >
-                      {Object.values(REGISTRATION_STATUS).map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                    <Button type="submit" size="sm" disabled={pending}>
-                      Save
-                    </Button>
-                  </form>
-                </TableCell>
+        {!registrations.length ? (
+          <EmptyState
+            icon={Users}
+            title="Your guest list is taking shape."
+            description="Share your published event page. Registrations will appear here, ready for your team to manage."
+          />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Attendee</TableHead>
+                <TableHead>Confirmation</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Registered</TableHead>
+                <TableHead className="w-56">Update</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {registrations.map((registration) => (
+                <TableRow key={registration.id}>
+                  <TableCell>
+                    <div className="font-medium">{registration.fullName}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {registration.email}
+                    </div>
+                  </TableCell>
+                  <TableCell>{registration.confirmationNumber}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{registration.status}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(registration.registeredAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <form action={action} className="flex items-center gap-2">
+                      <input
+                        type="hidden"
+                        name="registrationId"
+                        value={registration.id}
+                      />
+                      <select
+                        name="status"
+                        aria-label={
+                          'Registration status for ' + registration.fullName
+                        }
+                        defaultValue={registration.status}
+                        className="h-8 rounded-lg border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                      >
+                        {Object.values(REGISTRATION_STATUS).map((status) => (
+                          <option key={status} value={status}>
+                            {status.replaceAll('_', ' ')}
+                          </option>
+                        ))}
+                      </select>
+                      <Button type="submit" size="sm" disabled={pending}>
+                        Save
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   );
 }
-

@@ -2,7 +2,14 @@
 
 import Link from 'next/link';
 import { useActionState } from 'react';
-import { ArrowRight, Building2, Loader2, MailCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  Building2,
+  Loader2,
+  MailCheck,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react';
 import {
   forgotPasswordAction,
   loginAction,
@@ -55,7 +62,9 @@ function OAuthDivider() {
         <span className="w-full border-t" />
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="bg-card px-2 text-muted-foreground/70">or continue with email</span>
+        <span className="bg-card px-2 text-muted-foreground/70">
+          or continue with email
+        </span>
       </div>
     </div>
   );
@@ -108,13 +117,15 @@ function SubmitButton({
 
 function BrandHeader() {
   return (
-    <div className="mb-8 flex flex-col items-center justify-center gap-3">
+    <div className="auth-brand mb-8 flex flex-col items-center justify-center gap-3">
       <div className="flex size-10 items-center justify-center rounded-xl bg-primary shadow-sm">
         <Building2 className="size-5 text-primary-foreground" />
       </div>
       <div className="text-center">
         <span className="text-base font-bold tracking-tight">Gatepoint</span>
-        <p className="mt-0.5 text-xs text-muted-foreground">Event Registration Platform</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Event Registration Platform
+        </p>
       </div>
     </div>
   );
@@ -160,7 +171,8 @@ export function LoginForm({
             className={buttonVariants({
               variant: 'outline',
               size: 'lg',
-              className: 'mb-1 w-full gap-2 h-11 font-medium hover:shadow-sm transition-shadow',
+              className:
+                'mb-1 w-full gap-2 h-11 font-medium hover:shadow-sm transition-shadow',
             })}
           >
             <GoogleIcon />
@@ -171,13 +183,24 @@ export function LoginForm({
             <input type="hidden" name="redirectTo" value={redirectTo} />
             <FormMessage state={state} />
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="font-medium">Email</Label>
-              <Input id="email" name="email" type="email" autoComplete="email" className="h-10" placeholder="you@example.com" />
+              <Label htmlFor="email" className="font-medium">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                className="h-10"
+                placeholder="you@example.com"
+              />
               <FieldError errors={state.errors?.email} />
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
-                <Label htmlFor="password" className="font-medium">Password</Label>
+                <Label htmlFor="password" className="font-medium">
+                  Password
+                </Label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-primary hover:underline"
@@ -200,7 +223,10 @@ export function LoginForm({
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
           New to Gatepoint?{' '}
-          <Link href="/register" className="ml-1 font-medium text-primary hover:underline">
+          <Link
+            href="/register"
+            className="ml-1 font-medium text-primary hover:underline"
+          >
             Create an account
           </Link>
         </CardFooter>
@@ -213,10 +239,7 @@ export function LoginForm({
 // Register Form
 // ============================================================
 export function RegisterForm() {
-  const [state, action, pending] = useActionState(
-    registerAction,
-    initialState
-  );
+  const [state, action, pending] = useActionState(registerAction, initialState);
 
   return (
     <>
@@ -225,7 +248,7 @@ export function RegisterForm() {
         <CardHeader>
           <CardTitle>Create your account</CardTitle>
           <CardDescription>
-            Start building events with a free Gatepoint workspace.
+            Create your space. Bring your next event to life.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -234,7 +257,8 @@ export function RegisterForm() {
             className={buttonVariants({
               variant: 'outline',
               size: 'lg',
-              className: 'mb-1 w-full gap-2 h-11 font-medium hover:shadow-sm transition-shadow',
+              className:
+                'mb-1 w-full gap-2 h-11 font-medium hover:shadow-sm transition-shadow',
             })}
           >
             <GoogleIcon />
@@ -244,17 +268,36 @@ export function RegisterForm() {
           <form action={action} className="space-y-4">
             <FormMessage state={state} />
             <div className="space-y-1.5">
-              <Label htmlFor="fullName" className="font-medium">Full name</Label>
-              <Input id="fullName" name="fullName" autoComplete="name" className="h-10" placeholder="Jane Smith" />
+              <Label htmlFor="fullName" className="font-medium">
+                Full name
+              </Label>
+              <Input
+                id="fullName"
+                name="fullName"
+                autoComplete="name"
+                className="h-10"
+                placeholder="Jane Smith"
+              />
               <FieldError errors={state.errors?.fullName} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="font-medium">Email</Label>
-              <Input id="email" name="email" type="email" autoComplete="email" className="h-10" placeholder="you@example.com" />
+              <Label htmlFor="email" className="font-medium">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                className="h-10"
+                placeholder="you@example.com"
+              />
               <FieldError errors={state.errors?.email} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="font-medium">Password</Label>
+              <Label htmlFor="password" className="font-medium">
+                Password
+              </Label>
               <Input
                 id="password"
                 name="password"
@@ -266,7 +309,9 @@ export function RegisterForm() {
               <FieldError errors={state.errors?.password} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="font-medium">Confirm password</Label>
+              <Label htmlFor="confirmPassword" className="font-medium">
+                Confirm password
+              </Label>
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -284,7 +329,10 @@ export function RegisterForm() {
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/login" className="ml-1 font-medium text-primary hover:underline">
+          <Link
+            href="/login"
+            className="ml-1 font-medium text-primary hover:underline"
+          >
             Sign in
           </Link>
         </CardFooter>
@@ -316,8 +364,17 @@ export function ForgotPasswordForm() {
           <form action={action} className="space-y-4">
             <FormMessage state={state} />
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="font-medium">Email</Label>
-              <Input id="email" name="email" type="email" autoComplete="email" className="h-10" placeholder="you@example.com" />
+              <Label htmlFor="email" className="font-medium">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                className="h-10"
+                placeholder="you@example.com"
+              />
               <FieldError errors={state.errors?.email} />
             </div>
             <SubmitButton pending={pending}>Send reset link</SubmitButton>
@@ -325,7 +382,10 @@ export function ForgotPasswordForm() {
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
           Remembered it?{' '}
-          <Link href="/login" className="ml-1 font-medium text-primary hover:underline">
+          <Link
+            href="/login"
+            className="ml-1 font-medium text-primary hover:underline"
+          >
             Sign in
           </Link>
         </CardFooter>
@@ -357,7 +417,9 @@ export function ResetPasswordForm() {
           <form action={action} className="space-y-4">
             <FormMessage state={state} />
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="font-medium">New password</Label>
+              <Label htmlFor="password" className="font-medium">
+                New password
+              </Label>
               <Input
                 id="password"
                 name="password"
@@ -369,7 +431,9 @@ export function ResetPasswordForm() {
               <FieldError errors={state.errors?.password} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="font-medium">Confirm new password</Label>
+              <Label htmlFor="confirmPassword" className="font-medium">
+                Confirm new password
+              </Label>
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -414,7 +478,9 @@ export function VerifyEmailForm({ email }: { email: string }) {
           <form action={action} className="space-y-4">
             <FormMessage state={state} />
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="font-medium">Email</Label>
+              <Label htmlFor="email" className="font-medium">
+                Email
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -431,7 +497,10 @@ export function VerifyEmailForm({ email }: { email: string }) {
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
           Already verified?{' '}
-          <Link href="/login" className="ml-1 font-medium text-primary hover:underline">
+          <Link
+            href="/login"
+            className="ml-1 font-medium text-primary hover:underline"
+          >
             Sign in
           </Link>
         </CardFooter>

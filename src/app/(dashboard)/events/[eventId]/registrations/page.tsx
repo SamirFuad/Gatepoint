@@ -1,3 +1,4 @@
+import { WorkspacePageHeader } from '@/components/layout/workspace-page-header';
 import { notFound } from 'next/navigation';
 import { createEventService } from '@/features/events/services/supabase-event-service';
 import {
@@ -33,15 +34,10 @@ export default async function RegistrationFormBuilderPage({
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 animate-fade-in-up">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Registration form
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Build the attendee form for {eventResult.data.title}.
-        </p>
-        <div className="mt-5 h-px bg-border" />
-      </div>
+      <WorkspacePageHeader
+        title="Registration form"
+        description="Ask for what matters. Build a thoughtful registration experience for your guests."
+      />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-6">

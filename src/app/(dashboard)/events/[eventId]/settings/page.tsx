@@ -1,3 +1,4 @@
+import { WorkspacePageHeader } from '@/components/layout/workspace-page-header';
 import { notFound } from 'next/navigation';
 import { EventSettingsForm } from '@/features/events/components/event-forms';
 import { createEventService } from '@/features/events/services/supabase-event-service';
@@ -23,13 +24,10 @@ export default async function EventSettingsPage({
 
   return (
     <div className="mx-auto w-full max-w-4xl animate-fade-in-up">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Event Settings</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Configure details for {result.data.title}.
-        </p>
-        <div className="mt-5 h-px bg-border" />
-      </div>
+      <WorkspacePageHeader
+        title="Event details & settings"
+        description="Fine-tune your schedule, venue, capacity, and publication status."
+      />
       <EventSettingsForm event={result.data} />
     </div>
   );

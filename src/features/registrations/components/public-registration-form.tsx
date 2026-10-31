@@ -103,7 +103,9 @@ function DynamicField({
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium">
           {field.label}
-          {field.isRequired ? <span className="text-destructive">*</span> : null}
+          {field.isRequired ? (
+            <span className="text-destructive">*</span>
+          ) : null}
         </legend>
         <div className="space-y-2">
           {field.options.map((option) => (
@@ -152,10 +154,7 @@ export function PublicRegistrationForm({
   form: RegistrationFormWithFields;
 }) {
   const actionForSlug = submitPublicRegistrationAction.bind(null, event.slug);
-  const [state, action, pending] = useActionState(
-    actionForSlug,
-    initialState
-  );
+  const [state, action, pending] = useActionState(actionForSlug, initialState);
 
   return (
     <Card>
@@ -176,12 +175,27 @@ export function PublicRegistrationForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full name</Label>
-              <Input id="fullName" name="fullName" autoComplete="name" />
+              <Input
+                id="fullName"
+                name="fullName"
+                autoComplete="name"
+                required
+                placeholder="Selam Tesfaye"
+                aria-invalid={Boolean(state.errors?.fullName)}
+              />
               <FieldError errors={state.errors?.fullName} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" autoComplete="email" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder="you@example.com"
+                aria-invalid={Boolean(state.errors?.email)}
+              />
               <FieldError errors={state.errors?.email} />
             </div>
           </div>
@@ -197,4 +211,3 @@ export function PublicRegistrationForm({
     </Card>
   );
 }
-

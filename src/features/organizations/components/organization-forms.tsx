@@ -34,6 +34,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { ConfirmSubmit } from '@/components/common/confirm-submit';
 
 const initialState: OrganizationActionState = {};
 
@@ -139,10 +140,7 @@ export function OrganizationSettingsForm({
   organization: Organization;
 }) {
   const updateAction = updateOrganizationAction.bind(null, organization.id);
-  const [state, action, pending] = useActionState(
-    updateAction,
-    initialState
-  );
+  const [state, action, pending] = useActionState(updateAction, initialState);
 
   return (
     <Card>
@@ -226,7 +224,7 @@ export function InviteMemberForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={action} className="grid gap-4 lg:grid-cols-[1fr_180px_auto]">
+        <form action={action} className="member-invite-form">
           <input type="hidden" name="organizationId" value={organizationId} />
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -305,10 +303,14 @@ export function MembersTable({ members }: { members: OrganizationMember[] }) {
                   {member.role === ROLES.OWNER ? (
                     <span className="text-sm capitalize">{member.role}</span>
                   ) : (
-                    <form action={roleAction} className="flex items-center gap-2">
+                    <form
+                      action={roleAction}
+                      className="flex items-center gap-2"
+                    >
                       <input type="hidden" name="memberId" value={member.id} />
                       <select
                         name="role"
+                        aria-label={'Role for ' + member.user.email}
                         defaultValue={member.role}
                         className="h-8 rounded-lg border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                       >
@@ -331,15 +333,15 @@ export function MembersTable({ members }: { members: OrganizationMember[] }) {
                   {member.role !== ROLES.OWNER ? (
                     <form action={removeAction}>
                       <input type="hidden" name="memberId" value={member.id} />
-                      <Button
-                        type="submit"
-                        size="icon-sm"
-                        variant="destructive"
+                      <ConfirmSubmit
+                        title={'Remove ' + member.user.email + '?'}
+                        description="This person will lose access to the organization workspace. You can add them again later."
+                        confirmLabel="Remove member"
                         disabled={removePending}
-                        aria-label={`Remove ${member.user.email}`}
+                        iconOnly
                       >
                         <Trash2 />
-                      </Button>
+                      </ConfirmSubmit>
                     </form>
                   ) : null}
                 </TableCell>
@@ -351,4 +353,3 @@ export function MembersTable({ members }: { members: OrganizationMember[] }) {
     </Card>
   );
 }
-

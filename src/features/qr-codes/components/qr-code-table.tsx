@@ -3,13 +3,11 @@
 import Image from 'next/image';
 import { useActionState } from 'react';
 import { Download, QrCode } from 'lucide-react';
-import {
-  generateQRCodeAction,
-  type QRCodeActionState,
-} from '../actions';
+import { generateQRCodeAction, type QRCodeActionState } from '../actions';
 import type { Registration } from '@/features/registrations/services/registration-service.interface';
 import type { QRCodeRecord } from '../services/qr-code-service.interface';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/common/empty-state';
 import {
   Card,
   CardContent,
@@ -83,80 +81,90 @@ export function QRCodeTable({
       </CardHeader>
       <CardContent className="space-y-4">
         <FormMessage state={state} />
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Attendee</TableHead>
-              <TableHead>Code</TableHead>
-              <TableHead>QR</TableHead>
-              <TableHead className="w-48 text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {registrations.map((registration) => {
-              const qrCode = qrByRegistration.get(registration.id);
+        {!registrations.length ? (
+          <EmptyState
+            icon={QrCode}
+            title="Every guest gets a personal pass."
+            description="Once guests register, generate and download their unique QR codes here."
+          />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Attendee</TableHead>
+                <TableHead>Code</TableHead>
+                <TableHead>QR</TableHead>
+                <TableHead className="w-48 text-right">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {registrations.map((registration) => {
+                const qrCode = qrByRegistration.get(registration.id);
 
-              return (
-                <TableRow key={registration.id}>
-                  <TableCell>
-                    <div className="font-medium">{registration.fullName}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {registration.confirmationNumber}
-                    </div>
-                  </TableCell>
-                  <TableCell>{qrCode?.code ?? 'Not generated'}</TableCell>
-                  <TableCell>
-                    {qrCode?.qrImageUrl ? (
-                      <Image
-                        src={qrCode.qrImageUrl}
-                        alt={`QR code for ${registration.fullName}`}
-                        width={72}
-                        height={72}
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="flex size-16 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
-                        <QrCode className="size-5" />
+                return (
+                  <TableRow key={registration.id}>
+                    <TableCell>
+                      <div className="font-medium">{registration.fullName}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {registration.confirmationNumber}
                       </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    </TableCell>
+                    <TableCell>{qrCode?.code ?? 'Not generated'}</TableCell>
+                    <TableCell>
                       {qrCode?.qrImageUrl ? (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            downloadQRCode(
-                              qrCode.qrImageUrl!,
-                              `qr-${registration.confirmationNumber}.png`
-                            )
-                          }
-                        >
-                          <Download className="size-4" />
-                        </Button>
-                      ) : null}
-                      <form action={action}>
-                        <input type="hidden" name="eventId" value={eventId} />
-                        <input
-                          type="hidden"
-                          name="registrationId"
-                          value={registration.id}
+                        <Image
+                          src={qrCode.qrImageUrl}
+                          alt={`QR code for ${registration.fullName}`}
+                          width={72}
+                          height={72}
+                          unoptimized
                         />
-                        <Button type="submit" size="sm" disabled={pending}>
-                          {qrCode ? 'Refresh' : 'Generate'}
-                        </Button>
-                      </form>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                      ) : (
+                        <div className="flex size-16 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
+                          <QrCode className="size-5" />
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {qrCode?.qrImageUrl ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            aria-label={
+                              'Download QR code for ' + registration.fullName
+                            }
+                            onClick={() =>
+                              downloadQRCode(
+                                qrCode.qrImageUrl!,
+                                `qr-${registration.confirmationNumber}.png`
+                              )
+                            }
+                          >
+                            <Download className="size-4" />
+                          </Button>
+                        ) : null}
+                        <form action={action}>
+                          <input type="hidden" name="eventId" value={eventId} />
+                          <input
+                            type="hidden"
+                            name="registrationId"
+                            value={registration.id}
+                          />
+                          <Button type="submit" size="sm" disabled={pending}>
+                            {qrCode ? 'Refresh' : 'Generate'}
+                          </Button>
+                        </form>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   );
 }
-

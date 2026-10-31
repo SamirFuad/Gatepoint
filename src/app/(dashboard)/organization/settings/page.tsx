@@ -1,3 +1,4 @@
+import { WorkspacePageHeader } from '@/components/layout/workspace-page-header';
 import { redirect } from 'next/navigation';
 import { createOrganizationService } from '@/features/organizations/services/supabase-organization-service';
 import { OrganizationSettingsForm } from '@/features/organizations/components/organization-forms';
@@ -24,14 +25,10 @@ export default async function OrganizationSettingsPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl animate-fade-in-up">
-      <div className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary">Organization</p>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Manage your organization profile and preferences.
-        </p>
-        <div className="mt-5 h-px bg-border" />
-      </div>
+      <WorkspacePageHeader
+        title="Workspace settings"
+        description="Your organization, thoughtfully introduced. Manage your profile and preferences."
+      />
       <OrganizationSettingsForm organization={organization} />
     </div>
   );

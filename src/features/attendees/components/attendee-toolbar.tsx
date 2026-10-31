@@ -61,10 +61,11 @@ export function AttendeeToolbar({
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            aria-label="Search attendees by name, email, or confirmation"
             placeholder="Search name, email, or confirmation…"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="w-72 pl-9"
+            className="w-full min-w-0 pl-9 sm:w-72"
           />
         </div>
         <Button type="submit" size="sm" variant="secondary">
@@ -76,6 +77,7 @@ export function AttendeeToolbar({
             size="sm"
             variant="ghost"
             onClick={handleClear}
+            aria-label="Clear attendee search"
           >
             <X className="size-4" />
           </Button>

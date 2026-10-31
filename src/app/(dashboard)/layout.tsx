@@ -20,7 +20,10 @@ export default async function DashboardLayout({
   }
 
   return (
-    <DashboardShell hasOrganization={Boolean(result.data?.length)}>
+    <DashboardShell
+      hasOrganization={Boolean(result.data?.length)}
+      workspaceName={result.data?.[0]?.name}
+    >
       {children}
     </DashboardShell>
   );

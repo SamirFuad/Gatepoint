@@ -56,7 +56,7 @@ export const eventSchema = z
     message: 'End date must be after the start date.',
   });
 
-export const updateEventSchema = eventSchema.extend({
+export const updateEventSchema = eventSchema.safeExtend({
   status: z
     .enum([
       EVENT_STATUS.DRAFT,
@@ -72,4 +72,3 @@ export const eventIdSchema = z.object({
 });
 
 export type EventInput = z.infer<typeof eventSchema>;
-

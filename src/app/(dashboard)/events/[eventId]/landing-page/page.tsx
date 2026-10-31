@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { WorkspacePageHeader } from '@/components/layout/workspace-page-header';
 import { notFound } from 'next/navigation';
 import { ExternalLink } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
@@ -34,27 +35,25 @@ export default async function EventLandingPageEditor({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 animate-fade-in-up">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Landing page
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Editing public content for {eventResult.data.title}.
-          </p>
-        </div>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <WorkspacePageHeader
+        title="Give your event a beautiful home."
+        description={`Make the first impression count for ${eventResult.data.title}.`}
+      >
         <Link
-          href={`/public/events/${eventResult.data.slug}`}
+          href={`/events/${eventId}/preview`}
           className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
           target="_blank"
         >
           <ExternalLink />
-          Preview
+          Preview page
         </Link>
-      </div>
-      <div className="h-px bg-border" />
-      <LandingPageForm eventId={eventId} config={configResult.data} />
+      </WorkspacePageHeader>
+      <LandingPageForm
+        eventId={eventId}
+        config={configResult.data}
+        event={eventResult.data}
+      />
     </div>
   );
 }

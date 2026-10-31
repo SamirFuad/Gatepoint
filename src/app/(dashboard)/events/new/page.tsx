@@ -1,26 +1,72 @@
-import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  CalendarDays,
+  Check,
+  Globe,
+  Send,
+} from 'lucide-react';
 import { CreateEventForm } from '@/features/events/components/event-forms';
-
 export const dynamic = 'force-dynamic';
-
-export const metadata = {
-  title: 'New Event',
-};
-
+export const metadata = { title: 'Create an Event' };
 export default function NewEventPage() {
   return (
-    <div className="mx-auto w-full max-w-4xl animate-fade-in-up">
-      <div className="mb-6">
-        <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-accent ring-1 ring-primary/10">
-          <Plus className="size-5 text-primary" />
+    <div className="mx-auto w-full max-w-6xl">
+      <Link href="/events" className="event-back">
+        <ArrowLeft size={14} />
+        Your events
+      </Link>
+      <div className="dashboard-greeting mb-9">
+        <div>
+          <h1>Every gathering starts with an idea.</h1>
+          <p>
+            Tell us about yours. You can fine-tune the details before
+            publishing.
+          </p>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">Create new event</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Fill in the details to set up your event.
-        </p>
-        <div className="mt-5 h-px bg-border" />
       </div>
-      <CreateEventForm />
+      <div className="event-create-layout">
+        <CreateEventForm />
+        <aside className="event-create-guide">
+          <CalendarDays size={28} strokeWidth={1.2} />
+          <h2>
+            A little planning.
+            <br />A great beginning.
+          </h2>
+          <p>
+            Start with the essentials. Bring the rest together when you’re
+            ready.
+          </p>
+          <ol>
+            <li>
+              <Check size={15} />
+              <span>
+                <strong>Set the scene</strong>Add your event details, date, and
+                venue.
+              </span>
+            </li>
+            <li>
+              <Globe size={15} />
+              <span>
+                <strong>Make it yours</strong>Customize your event page and
+                registration form.
+              </span>
+            </li>
+            <li>
+              <Send size={15} />
+              <span>
+                <strong>Open the invitation</strong>Publish and share your event
+                with your people.
+              </span>
+            </li>
+          </ol>
+          <Link href="/public/events" className="text-link">
+            Explore other gatherings
+            <ArrowUpRight size={15} />
+          </Link>
+        </aside>
+      </div>
     </div>
   );
 }
