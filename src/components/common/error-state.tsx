@@ -1,8 +1,9 @@
 // =============================================================
-// Gatepoint — Error State Component
+// Gatepoint — Error State Component (v3)
+// Redesigned: refined, on-brand, accessible
 // =============================================================
 
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type ErrorStateProps = {
@@ -27,17 +28,23 @@ export function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   return (
-    <div className="flex min-h-[300px] flex-col items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5 p-8 text-center">
-      <div className="mb-4 rounded-full bg-destructive/10 p-3">
-        <AlertCircle className="h-6 w-6 text-destructive" />
+    <div className="flex min-h-[260px] flex-col items-center justify-center rounded-lg border border-destructive/15 bg-destructive/[0.03] p-8 text-center">
+      <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-destructive/10 ring-1 ring-destructive/10">
+        <AlertCircle className="size-5 text-destructive" />
       </div>
-      <h3 className="mb-1 text-lg font-semibold">{title}</h3>
-      <p className="mb-4 max-w-sm text-sm text-muted-foreground">
+      <h3 className="text-sm font-semibold tracking-tight text-foreground">{title}</h3>
+      <p className="mt-1.5 max-w-[300px] text-[13px] leading-relaxed text-muted-foreground">
         {message}
       </p>
       {onRetry && (
-        <Button variant="outline" onClick={onRetry}>
-          Try Again
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRetry}
+          className="mt-5 gap-1.5"
+        >
+          <RefreshCcw className="size-3.5" />
+          Try again
         </Button>
       )}
     </div>

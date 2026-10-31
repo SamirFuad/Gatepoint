@@ -186,7 +186,13 @@ export class ResendEmailService implements IEmailService {
     text: string;
   }): Promise<ApiResponse<EmailResult>> {
     if (!this.resend || !process.env.RESEND_API_KEY) {
-      return { data: { id: null, skipped: true }, error: null };
+      return {
+        data: null,
+        error: {
+          message:
+            'Email delivery is not configured. Set RESEND_API_KEY in the deployment environment.',
+        },
+      };
     }
 
     const { data, error } = await this.resend.emails.send({

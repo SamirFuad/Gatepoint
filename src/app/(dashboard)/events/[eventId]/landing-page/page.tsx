@@ -34,10 +34,10 @@ export default async function EventLandingPageEditor({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 animate-fade-in-up">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-bold tracking-tight">
             Landing page
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -53,8 +53,8 @@ export default async function EventLandingPageEditor({
           Preview
         </Link>
       </div>
+      <div className="h-px bg-border" />
       <LandingPageForm eventId={eventId} config={configResult.data} />
     </div>
   );
 }
-

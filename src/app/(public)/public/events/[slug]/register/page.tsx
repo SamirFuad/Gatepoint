@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { PublicRegistrationForm } from '@/features/registrations/components/public-registration-form';
@@ -31,14 +32,15 @@ export default async function PublicRegisterPage({
   if (formResult.error || !formResult.data || !formResult.data.isActive) {
     return (
       <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-4 py-12">
-        <h1 className="text-2xl font-semibold">Registration unavailable</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Registration unavailable</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           This event is published, but its registration form is not active yet.
         </p>
         <Link
           href={`/public/events/${slug}`}
-          className={cn(buttonVariants({ variant: 'outline' }), 'mt-6 w-fit')}
+          className={cn(buttonVariants({ variant: 'outline' }), 'mt-6 w-fit gap-2')}
         >
+          <ArrowLeft className="size-4" />
           Back to event
         </Link>
       </main>
@@ -46,18 +48,20 @@ export default async function PublicRegisterPage({
   }
 
   return (
-    <main className="min-h-screen bg-muted/30 px-4 py-10">
+    <main className="min-h-screen bg-background px-4 py-10">
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
         <div>
           <Link
             href={`/public/events/${slug}`}
-            className="text-sm text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm text-primary transition-colors hover:text-primary/80 hover:underline"
           >
+            <ArrowLeft className="size-3.5" />
             Back to event
           </Link>
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight">
+          <h1 className="mt-4 text-2xl font-bold tracking-tight">
             Register for {eventResult.data.title}
           </h1>
+          <div className="mt-5 h-px bg-border" />
         </div>
         <PublicRegistrationForm
           event={eventResult.data}
@@ -67,4 +71,3 @@ export default async function PublicRegisterPage({
     </main>
   );
 }
-

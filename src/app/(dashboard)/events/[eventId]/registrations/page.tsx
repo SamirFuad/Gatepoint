@@ -32,14 +32,15 @@ export default async function RegistrationFormBuilderPage({
   const form = formResult.data ?? null;
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 animate-fade-in-up">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-bold tracking-tight">
           Registration form
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Build the attendee form for {eventResult.data.title}.
         </p>
+        <div className="mt-5 h-px bg-border" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
@@ -59,4 +60,3 @@ export default async function RegistrationFormBuilderPage({
     </div>
   );
 }
-

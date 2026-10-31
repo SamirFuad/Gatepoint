@@ -23,9 +23,16 @@ export default async function OrganizationSettingsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="mx-auto w-full max-w-3xl animate-fade-in-up">
+      <div className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">Organization</p>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight">Settings</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Manage your organization profile and preferences.
+        </p>
+        <div className="mt-5 h-px bg-border" />
+      </div>
       <OrganizationSettingsForm organization={organization} />
     </div>
   );
 }
-

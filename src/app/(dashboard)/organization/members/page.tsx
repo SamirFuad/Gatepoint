@@ -35,10 +35,17 @@ export default async function OrganizationMembersPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 animate-fade-in-up">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">Organization</p>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight">Members</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Manage team access and invite new members.
+        </p>
+        <div className="mt-5 h-px bg-border" />
+      </div>
       <InviteMemberForm organizationId={organization.id} />
       <MembersTable members={membersResult.data?.data ?? []} />
     </div>
   );
 }
-

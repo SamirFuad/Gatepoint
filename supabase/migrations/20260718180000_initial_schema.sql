@@ -165,6 +165,7 @@ create table public.registrations (
   form_id uuid not null references public.registration_forms(id) on delete restrict,
   confirmation_number text not null unique,
   email text not null,
+  phone text,
   full_name text not null,
   status text not null default 'pending',
   metadata jsonb not null default '{}'::jsonb,
@@ -485,6 +486,11 @@ create index registrations_event_id_idx on public.registrations (event_id);
 create index registrations_organization_id_idx on public.registrations (organization_id);
 create index registrations_form_id_idx on public.registrations (form_id);
 create index registrations_email_idx on public.registrations (email);
+create unique index registrations_event_email_unique_idx
+on public.registrations (event_id, lower(email));
+create unique index registrations_event_phone_unique_idx
+on public.registrations (event_id, phone)
+where phone is not null;
 create index registrations_status_idx on public.registrations (status);
 create index registration_responses_registration_id_idx
   on public.registration_responses (registration_id);

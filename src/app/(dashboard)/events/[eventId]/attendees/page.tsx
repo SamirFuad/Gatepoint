@@ -38,12 +38,13 @@ export default async function AttendeesPage({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 animate-fade-in-up">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Attendees</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Attendees</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Registrations for {eventResult.data.title}.
         </p>
+        <div className="mt-5 h-px bg-border" />
       </div>
       <AttendeeToolbar eventId={eventId} initialSearch={search} />
       <RegistrationTable

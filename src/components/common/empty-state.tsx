@@ -1,5 +1,6 @@
 // =============================================================
-// Gatepoint — Empty State Component
+// Gatepoint — Empty State Component (v3)
+// Redesigned: distinctive, purposeful, accessible
 // =============================================================
 
 import { type LucideIcon } from 'lucide-react';
@@ -34,18 +35,20 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <div className="flex min-h-[300px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+    <div className="flex min-h-[240px] flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/10 p-8 text-center transition-colors">
       {Icon && (
-        <div className="mb-4 rounded-full bg-muted p-3">
-          <Icon className="h-6 w-6 text-muted-foreground" />
+        <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-accent/80 ring-1 ring-primary/10">
+          <Icon className="size-5 text-primary" />
         </div>
       )}
-      <h3 className="mb-1 text-lg font-semibold">{title}</h3>
-      <p className="mb-4 max-w-sm text-sm text-muted-foreground">
+      <h3 className="text-sm font-semibold tracking-tight text-foreground">{title}</h3>
+      <p className="mt-1.5 max-w-[280px] text-[13px] leading-relaxed text-muted-foreground">
         {description}
       </p>
       {actionLabel && onAction && (
-        <Button onClick={onAction}>{actionLabel}</Button>
+        <Button onClick={onAction} className="mt-5 glow-cobalt" size="sm">
+          {actionLabel}
+        </Button>
       )}
     </div>
   );

@@ -49,6 +49,7 @@ function toRegistration(row: RegistrationRow): Registration {
     formId: row.form_id,
     confirmationNumber: row.confirmation_number,
     email: row.email,
+    phone: row.phone,
     fullName: row.full_name,
     status: row.status,
     metadata: toObject(row.metadata),
@@ -99,6 +100,7 @@ export class SupabaseRegistrationService implements IRegistrationService {
         form_id: data.formId,
         confirmation_number: createConfirmationNumber(),
         email: data.email,
+        phone: data.phone ?? null,
         full_name: data.fullName,
         status: 'confirmed',
       })
@@ -106,6 +108,17 @@ export class SupabaseRegistrationService implements IRegistrationService {
       .single();
 
     if (error) {
+      if (error.code === '23505') {
+        return {
+          data: null,
+          error: {
+            message:
+              'This email address or phone number is already registered for this event.',
+            code: error.code,
+          },
+        };
+      }
+
       return { data: null, error: toApiError(error) };
     }
 

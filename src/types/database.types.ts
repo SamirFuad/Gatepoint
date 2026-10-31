@@ -366,6 +366,7 @@ export type Database = {
           form_id: string;
           confirmation_number: string;
           email: string;
+          phone: string | null;
           full_name: string;
           status:
             | 'pending'
@@ -385,6 +386,7 @@ export type Database = {
           form_id: string;
           confirmation_number: string;
           email: string;
+          phone?: string | null;
           full_name: string;
           status?:
             | 'pending'
@@ -404,6 +406,7 @@ export type Database = {
           form_id?: string;
           confirmation_number?: string;
           email?: string;
+          phone?: string | null;
           full_name?: string;
           status?:
             | 'pending'

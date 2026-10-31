@@ -8,6 +8,7 @@ export type Registration = {
   formId: string;
   confirmationNumber: string;
   email: string;
+  phone: string | null;
   fullName: string;
   status: RegistrationStatus;
   metadata: Record<string, unknown>;
@@ -32,6 +33,7 @@ export type CreateRegistrationData = {
   organizationId: string;
   formId: string;
   email: string;
+  phone?: string;
   fullName: string;
   responses: Array<{
     fieldId: string;

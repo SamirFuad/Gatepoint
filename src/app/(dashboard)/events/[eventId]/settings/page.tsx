@@ -22,9 +22,15 @@ export default async function EventSettingsPage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className="mx-auto w-full max-w-4xl animate-fade-in-up">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">Event Settings</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Configure details for {result.data.title}.
+        </p>
+        <div className="mt-5 h-px bg-border" />
+      </div>
       <EventSettingsForm event={result.data} />
     </div>
   );
 }
-
