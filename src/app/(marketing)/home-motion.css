@@ -257,3 +257,220 @@
     transform: rotate(-20deg);
   }
 }
+/* Full-page motion study — local preview, with a visitor-controlled pause. */
+.home-motion-control {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 45;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #ffffff45;
+  border-radius: 100px;
+  background: var(--forest);
+  color: var(--paper);
+  font-size: 11px;
+  box-shadow: 0 4px 20px #183d2f22;
+}
+.marketing-home .hero-photo {
+  clip-path: inset(0 round 200px 200px 24px 24px);
+}
+.marketing-home .hero-visual {
+  overflow: visible;
+}
+.marketing-home .hero-image-shade {
+  pointer-events: none;
+}
+.marketing-home .services-list article {
+  --reveal-y: 120px;
+  --reveal-rotate: 3deg;
+}
+.marketing-home .services-list article:nth-child(2) {
+  --reveal-y: 150px;
+  --reveal-rotate: -3deg;
+}
+.marketing-home .workflow-heading {
+  --reveal-x: -110px;
+  --reveal-y: 0px;
+}
+.marketing-home .workflow-steps article {
+  --reveal-x: 120px;
+  --reveal-y: 0px;
+}
+.marketing-home .faq-list details {
+  --reveal-x: 75px;
+  --reveal-y: 15px;
+}
+.marketing-home .cta-inner {
+  --reveal-y: 130px;
+}
+@keyframes home-reveal-bold {
+  from {
+    opacity: 0;
+    transform: translate(
+        calc(var(--reveal-x, 0px) * var(--entry-sign, 1)),
+        calc(var(--reveal-y, 110px) * var(--entry-sign, 1))
+      )
+      rotate(var(--reveal-rotate, 0deg)) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(1);
+  }
+}
+@keyframes gate-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-7deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(-3deg);
+  }
+}
+
+@keyframes icon-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-9px) rotate(-8deg);
+  }
+}
+@keyframes arrow-orbit {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  50% {
+    transform: translate(16px, -16px) rotate(7deg);
+  }
+}
+@keyframes gate-outline {
+  0%,
+  100% {
+    transform: rotate(-20deg);
+  }
+  50% {
+    transform: rotate(0deg) translate(-35px, -20px);
+  }
+}
+@keyframes panel-enter {
+  from {
+    opacity: 0;
+    transform: translateX(45px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marketing-home .home-revealed {
+    animation: home-reveal-bold 1.15s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+  .marketing-home .services-list article:nth-child(2).home-revealed {
+    animation-delay: 0.14s;
+  }
+  .marketing-home .services-list article:nth-child(3).home-revealed {
+    animation-delay: 0.28s;
+  }
+  .marketing-home .hero-copy.home-revealed {
+    animation: home-reveal-bold 1.15s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+  .marketing-home .hero-visual.home-revealed {
+    --reveal-x: 60px;
+    animation: home-reveal-bold 1.2s 0.15s cubic-bezier(0.16, 1, 0.3, 1)
+      backwards;
+  }
+  .marketing-home .hero-pass {
+    animation: gate-float 6s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .marketing-home .hero-visual::before {
+    animation: gate-outline 12s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .marketing-home .services-list article > svg {
+    animation: icon-bob 4s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .marketing-home .services-list article:nth-child(2) > svg {
+    animation-delay: -0.8s;
+  }
+  .marketing-home .services-list article:nth-child(3) > svg {
+    animation-delay: -1.6s;
+  }
+  .marketing-home .sample-event-art::after {
+    animation: gate-outline 10s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .marketing-home .cta-arrow {
+    animation: arrow-orbit 6s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .marketing-home .cta-inner::after {
+    animation: gate-outline 10s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+  .marketing-home .motion-in-view .hero-pass,
+  .marketing-home .motion-in-view .hero-visual::before,
+  .marketing-home .motion-in-view .services-list article > svg,
+  .marketing-home .motion-in-view .sample-event-art::after,
+  .marketing-home .motion-in-view .cta-arrow,
+  .marketing-home .motion-in-view .cta-inner::after {
+    animation-play-state: running;
+  }
+  .marketing-home .hero-pass:focus-within,
+  .marketing-home .hero-pass:hover {
+    animation-play-state: paused !important;
+  }
+  .marketing-home .product-sample > :not(.sample-top) {
+    animation: panel-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  .marketing-home .faq-list details[open] > p {
+    animation: home-reveal 0.4s ease-out;
+  }
+}
+.marketing-home[data-motion='paused'] *,
+.marketing-home[data-motion='paused'] *::before,
+.marketing-home[data-motion='paused'] *::after {
+  animation-play-state: paused !important;
+}
+/* Reveals must never leave content hidden when paused mid-entrance. */
+.marketing-home[data-motion='paused'] .home-revealed,
+.marketing-home[data-motion='paused'] .hero-copy,
+.marketing-home[data-motion='paused'] .hero-visual,
+.marketing-home[data-motion='paused'] .product-sample > :not(.sample-top) {
+  animation: none !important;
+}
+.marketing-home[data-motion='paused'] .pass-demo-button {
+  transform: none;
+}
+@media (max-width: 650px) {
+  .home-motion-control {
+    right: 12px;
+    bottom: 12px;
+    font-size: 10px;
+    padding-inline: 12px;
+  }
+  .marketing-home .hero-photo {
+    clip-path: inset(0 round 160px 160px 20px 20px);
+  }
+  .marketing-home .hero-pass {
+    animation-duration: 7s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-motion-control {
+    display: none;
+  }
+  .marketing-home *,
+  .marketing-home *::before,
+  .marketing-home *::after {
+    animation: none !important;
+  }
+}

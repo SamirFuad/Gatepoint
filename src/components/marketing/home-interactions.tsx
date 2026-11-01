@@ -7,33 +7,85 @@ import {
   QrCode,
   RotateCcw,
   ScanLine,
+  Pause,
+  Play,
 } from 'lucide-react';
 
-/** One observer for the page. Content remains visible without JavaScript. */
+/** Replay entrances on re-entry; a wider reset boundary prevents edge flicker. */
 export function HomeInteractions({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const targets = root.current?.querySelectorAll<HTMLElement>(
-      '.section-intro, .platform-feature, .services-intro, .services-list article, .workflow-heading, .workflow-steps article, .questions-section, .cta-inner'
+      '.hero-copy, .hero-visual, .section-intro, .platform-feature, .services-intro, .services-list article, .workflow-heading, .workflow-steps article, .questions-section > div, .faq-list details, .cta-inner'
     );
     if (!targets || !('IntersectionObserver' in window)) return;
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          if (!media.matches) entry.target.classList.add('home-revealed');
-          observer.unobserve(entry.target);
+          if (
+            !media.matches &&
+            !entry.target.classList.contains('home-revealed')
+          ) {
+            (entry.target as HTMLElement).style.setProperty(
+              '--entry-sign',
+              entry.boundingClientRect.top < 0 ? '-1' : '1'
+            );
+            entry.target.classList.add('home-revealed');
+          }
         }
       },
       { threshold: 0.12 }
     );
     targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
+    const reset = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting)
+            entry.target.classList.remove('home-revealed');
+        });
+      },
+      { rootMargin: '180px 0px', threshold: 0 }
+    );
+    targets.forEach((target) => reset.observe(target));
+    const ambient = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) =>
+          entry.target.classList.toggle('motion-in-view', entry.isIntersecting)
+        );
+      },
+      { threshold: 0 }
+    );
+    root.current
+      ?.querySelectorAll(
+        '.hero, .platform-feature, .services-section, .workflow-section, .cta-section'
+      )
+      .forEach((section) => ambient.observe(section));
+    return () => {
+      observer.disconnect();
+      reset.disconnect();
+      ambient.disconnect();
+    };
   }, []);
   return (
-    <div ref={root} id="top" className="marketing-home">
+    <div
+      ref={root}
+      id="top"
+      className="marketing-home"
+      data-motion={paused ? 'paused' : 'playing'}
+    >
       {children}
+      <button
+        className="home-motion-control"
+        type="button"
+        aria-pressed={paused}
+        onClick={() => setPaused(!paused)}
+      >
+        {paused ? <Play size={14} /> : <Pause size={14} />}
+        {paused ? 'Resume motion' : 'Pause motion'}
+      </button>
     </div>
   );
 }
