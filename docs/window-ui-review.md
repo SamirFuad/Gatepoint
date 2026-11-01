@@ -41,3 +41,17 @@ Core Web Vitals benchmark; real-device/network performance remains to be measure
 Styles are grouped in `src/app/window.css`, imported after the existing global
 styles, so the visual evolution remains easy to review and adjust independently
 of event/authentication business logic.
+
+## Homepage interaction follow-up
+
+Added a keyboard/touch event-pass demo with scan, confirmation, replay, and
+pointer tilt; an animated headline underline; one-time section reveals; and
+service/workflow hover feedback. The demo is explicitly marked as illustrative
+and performs no network requests. A single IntersectionObserver disconnects on
+unmount and unobserves each revealed element. Content stays visible without JS,
+and reduced-motion preferences disable decorative motion.
+
+Production build and TypeScript checks passed. Browser checks covered keyboard
+activation, scan completion, replay, a 390px mobile layout, and scroll reveals.
+The measured interaction build added approximately 1.2 KB gzipped JS and 1.4 KB
+CSS over the initial Window upgrade, with no new dependencies or images.

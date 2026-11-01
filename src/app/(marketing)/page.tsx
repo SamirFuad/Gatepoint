@@ -15,6 +15,11 @@ import {
   ScanLine,
   Users,
 } from 'lucide-react';
+import {
+  HomeInteractions,
+  InteractivePass,
+} from '@/components/marketing/home-interactions';
+import './home-motion.css';
 import { PlatformPreview } from '@/components/marketing/platform-preview';
 const services = [
   {
@@ -74,7 +79,7 @@ const questions = [
 ];
 export default function HomePage() {
   return (
-    <div id="top" className="marketing-home">
+    <HomeInteractions>
       <section className="hero site-container">
         <div className="hero-copy">
           <div className="eyebrow">
@@ -124,32 +129,7 @@ export default function HomePage() {
             <br />
             NEW POSSIBILITIES.
           </div>
-          <div className="hero-pass">
-            <div className="pass-top">
-              <span className="pass-icon">
-                <QrCode size={18} />
-              </span>
-              <span>
-                The good kind of
-                <br />
-                <strong>all-access.</strong>
-              </span>
-              <ArrowUpRight size={18} />
-            </div>
-            <div className="pass-rule" />
-            <div className="pass-body">
-              <span>
-                Less waiting.
-                <br />
-                More belonging.
-              </span>
-              <QrCode size={54} strokeWidth={1.4} />
-            </div>
-            <div className="pass-bottom">
-              <CheckCheck size={15} />
-              <span>Every guest, connected.</span>
-            </div>
-          </div>
+          <InteractivePass />
           <div className="hero-image-index">
             <span>People first.</span>
             <span>Always.</span>
@@ -321,6 +301,6 @@ export default function HomePage() {
           />
         </div>
       </section>
-    </div>
+    </HomeInteractions>
   );
 }

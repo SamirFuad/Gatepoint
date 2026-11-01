@@ -1,0 +1,259 @@
+/* Homepage-only motion. Finite, compositor-friendly and progressively enhanced. */
+.marketing-home .interactive-pass {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  perspective: 900px;
+  z-index: 2;
+}
+.pass-demo-button {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #e9f9cc;
+  border-radius: 16px;
+  background: var(--lime);
+  color: var(--ink);
+  box-shadow: var(--shadow-pass);
+  text-align: left;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition:
+    transform 0.18s ease-out,
+    background-color 0.3s;
+}
+.pass-demo-button .pass-rule {
+  display: block;
+}
+.pass-demo-button:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 6px;
+}
+.pass-demo-button[aria-disabled='true'] {
+  cursor: progress;
+}
+.pass-scan-code {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+.pass-scan-line {
+  position: absolute;
+  inset: 0 -6px auto;
+  height: 2px;
+  background: var(--forest);
+  box-shadow: 0 0 10px #294d3c80;
+  opacity: 0;
+}
+.pass-demo-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  margin-top: 18px;
+  padding: 7px;
+  border: 1px solid #294d3c30;
+  border-radius: 100px;
+  background: #ffffff40;
+  font-size: 10px;
+  font-weight: 600;
+}
+.pass-demo-label {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 8px;
+  opacity: 0.75;
+}
+.interactive-pass[data-phase='admitted'] .pass-demo-button {
+  background: #eef8dc;
+}
+.interactive-pass[data-phase='admitted'] .pass-scan-code {
+  color: #356439;
+}
+.pass-success-ring {
+  pointer-events: none;
+  position: absolute;
+  inset: -7px;
+  border: 2px solid var(--lime);
+  border-radius: 22px;
+  opacity: 0;
+}
+.marketing-home .hero h1 > span {
+  position: relative;
+  display: inline-block;
+}
+.marketing-home .hero h1 > span::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lime);
+  transform-origin: left;
+}
+.marketing-home .services-list article {
+  position: relative;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s,
+    background-color 0.25s;
+}
+.marketing-home .services-list article > svg {
+  transition: transform 0.3s ease;
+}
+.marketing-home .workflow-steps article > svg {
+  transition: transform 0.25s ease;
+}
+.marketing-home .workflow-steps article:hover > svg {
+  transform: translateX(6px);
+}
+.marketing-home .step-number {
+  transition:
+    color 0.2s,
+    background-color 0.2s;
+}
+.marketing-home .workflow-steps article:hover .step-number {
+  color: var(--forest);
+  background: var(--lime);
+  border-radius: 8px;
+}
+.marketing-home .faq-list summary > span {
+  transition: transform 0.25s ease;
+}
+.marketing-home .faq-list details[open] summary > span {
+  transform: rotate(45deg);
+}
+.marketing-home .cta-inner::after {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 420px;
+  right: -90px;
+  bottom: -170px;
+  border: 1px solid #183d2f25;
+  border-radius: 180px 180px 0 0;
+  pointer-events: none;
+  transform: rotate(-20deg);
+  transition: transform 0.6s ease;
+}
+.marketing-home .cta-inner:hover::after {
+  transform: rotate(-10deg) translateY(-15px);
+}
+.marketing-home .cta-inner > div {
+  position: relative;
+  z-index: 1;
+}
+@keyframes home-reveal {
+  from {
+    opacity: 0.25;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pass-scan {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(54px);
+  }
+}
+@keyframes pass-celebrate {
+  from {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.16);
+  }
+}
+@keyframes connection-underline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-revealed {
+    animation: home-reveal 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .services-list article:nth-child(2).home-revealed {
+    animation-delay: 0.08s;
+  }
+  .services-list article:nth-child(3).home-revealed {
+    animation-delay: 0.16s;
+  }
+  .interactive-pass[data-phase='scanning'] .pass-scan-line {
+    animation: pass-scan 0.55s ease-in-out 2;
+  }
+  .interactive-pass[data-phase='admitted'] .pass-success-ring {
+    animation: pass-celebrate 0.7s ease-out;
+  }
+  .interactive-pass[data-phase='admitted'] .pass-scan-code {
+    animation: home-reveal 0.35s ease-out;
+  }
+  .marketing-home .hero h1 > span::after {
+    animation: connection-underline 0.8s 0.5s cubic-bezier(0.2, 0.7, 0.2, 1)
+      both;
+  }
+  .product-sample > :not(.sample-top) {
+    animation: home-reveal 0.35s ease-out;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .marketing-home .services-list article:hover {
+    transform: translateY(-6px);
+    background: #ffffff08;
+  }
+  .marketing-home .services-list article:hover > svg {
+    transform: rotate(-8deg) scale(1.12);
+  }
+}
+@media (max-width: 650px) {
+  .marketing-home .interactive-pass {
+    width: 245px;
+    bottom: 65px;
+  }
+  .pass-demo-button {
+    padding: 17px;
+  }
+  .marketing-home .hero-visual {
+    min-height: 450px;
+  }
+  .pass-demo-action {
+    min-height: 44px;
+  }
+  .marketing-home .hero h1 > span::after {
+    height: 3px;
+    bottom: -5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pass-demo-button {
+    transform: none;
+  }
+  .marketing-home .workflow-steps article:hover > svg {
+    transform: none;
+  }
+  .marketing-home .cta-inner:hover::after {
+    transform: rotate(-20deg);
+  }
+}
