@@ -32,9 +32,6 @@ const AUTH_ROUTES = [
   '/reset-password',
 ];
 
-// Routes that are always public
-const PUBLIC_ROUTES = ['/', '/verify-email', '/api', '/auth/callback'];
-
 /**
  * Checks if the current path matches any of the given route prefixes.
  */
@@ -46,18 +43,6 @@ function matchesRoute(pathname: string, routes: string[]): boolean {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Always allow public routes and static assets
-  if (
-    matchesRoute(pathname, PUBLIC_ROUTES) ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon') ||
-    pathname.includes('.')
-  ) {
-    // Still refresh the session for public routes
-    const { supabaseResponse } = await updateSession(request);
-    return supabaseResponse;
-  }
 
   // Refresh session and get user
   const { supabaseResponse, user } = await updateSession(request);
@@ -100,8 +85,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization)
      * - favicon.ico (favicon file)
-     * - public files with extensions
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

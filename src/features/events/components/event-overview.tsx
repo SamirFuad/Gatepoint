@@ -2,6 +2,7 @@ import { CalendarDays, MapPin, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { EventLifecycleActions } from './event-lifecycle-actions';
+import { EventShare } from './event-share';
 import type { Event } from '../services/event-service.interface';
 function DetailStatusBadge({
   status,
@@ -58,6 +59,9 @@ export function EventOverview({ event }: { event: Event }) {
         </div>
         <div className="mt-5 h-px bg-border" />
       </div>
+      {event.isPublished && event.status === 'published' && (
+        <EventShare slug={event.slug} title={event.title} />
+      )}
       {/* Event essentials */}
       <div className="grid gap-4 md:grid-cols-3">
         <div className="card-stat p-5 pt-6">

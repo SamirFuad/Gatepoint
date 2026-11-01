@@ -53,7 +53,8 @@ export const eventSchema = z
   })
   .refine((data) => new Date(data.endsAt) > new Date(data.startsAt), {
     path: ['endsAt'],
-    message: 'End date must be after the start date.',
+    message:
+      'End time must be after the start time. Both can be on the same date.',
   });
 
 export const updateEventSchema = eventSchema.safeExtend({

@@ -414,3 +414,178 @@ test('public navigation shows the signed-in name and routes organizers straight 
     'hana'
   );
 });
+
+test('copied organizer URLs and token-like query strings never authenticate an anonymous visitor', async () => {
+  const { redirectWithSession } = loadModule(
+    'src/lib/supabase/session-response.ts'
+  );
+  const { proxy, config } = loadModule('src/proxy.ts', {
+    '@/lib/supabase/middleware': {
+      updateSession: async () => ({
+        user: null,
+        supabaseResponse: NextResponse.next(),
+      }),
+    },
+    '@/lib/supabase/session-response': { redirectWithSession },
+  });
+  for (const route of [
+    '/dashboard',
+    '/events',
+    '/events/new',
+    '/events/someone-elses-event',
+    '/events/event.png/settings',
+    '/organization/members',
+    '/create-organization',
+  ]) {
+    const response = await proxy(
+      new NextRequest(
+        'https://gatepoint.example' +
+          route +
+          '?userId=owner&access_token=copied&session=logged-in'
+      )
+    );
+    assert.equal(response.status, 307);
+    assert.equal(new URL(response.headers.get('location')).pathname, '/login');
+  }
+  assert.equal(
+    new RegExp('^' + config.matcher[0] + '$').test('/events/event.png'),
+    true
+  );
+});
+
+test('organizer layouts reject absent sessions and other organizers event links', async () => {
+  const navigation = {
+    redirect: () => {
+      throw new Error('LOGIN_REQUIRED');
+    },
+    notFound: () => {
+      throw new Error('ACCESS_DENIED');
+    },
+  };
+  const eventLayout = 'src/app/(dashboard)/events/[eventId]/layout.tsx';
+  for (const signedIn of [false, true]) {
+    const { default: Layout } = loadModule(eventLayout, {
+      'next/navigation': navigation,
+      '@/lib/supabase/server': {
+        createClient: async () => ({
+          auth: {
+            getUser: async () => ({
+              data: { user: signedIn ? { id: 'other-user' } : null },
+              error: null,
+            }),
+          },
+          rpc: async () => ({ data: false, error: null }),
+        }),
+      },
+    });
+    await assert.rejects(
+      () =>
+        Layout({
+          children: 'private content',
+          params: Promise.resolve({ eventId: 'private-event' }),
+        }),
+      signedIn ? /ACCESS_DENIED/ : /LOGIN_REQUIRED/
+    );
+  }
+  const { default: Dashboard } = loadModule('src/app/(dashboard)/layout.tsx', {
+    'next/navigation': navigation,
+    '@/lib/supabase/server': {
+      createClient: async () => ({
+        auth: { getUser: async () => ({ data: { user: null }, error: null }) },
+      }),
+    },
+    '@/features/organizations/services/supabase-organization-service': {
+      createOrganizationService: () => {
+        throw new Error('MUST_NOT_LOAD_PRIVATE_DATA');
+      },
+    },
+  });
+  await assert.rejects(
+    () => Dashboard({ children: 'private content' }),
+    /LOGIN_REQUIRED/
+  );
+});
+
+test('same-day event creation and updates accept later end times and reject equal or earlier times', () => {
+  const { eventSchema, updateEventSchema } = loadModule(
+    'src/features/events/schemas/event-schemas.ts'
+  );
+  const event = {
+    title: 'Same day gathering',
+    eventType: 'conference',
+    timezone: 'Africa/Addis_Ababa',
+    startsAt: '2026-11-02T09:00',
+    endsAt: '2026-11-02T17:00',
+    maxAttendees: 100,
+  };
+  for (const schema of [eventSchema, updateEventSchema]) {
+    assert.equal(schema.safeParse(event).success, true);
+    assert.equal(
+      schema.safeParse({ ...event, endsAt: '2026-11-02T09:00' }).success,
+      false
+    );
+    assert.equal(
+      schema.safeParse({ ...event, endsAt: '2026-11-02T08:59' }).success,
+      false
+    );
+  }
+});
+
+test('published event sharing copies and sends only the public URL', async () => {
+  const originalWindow = globalThis.window;
+  const originalNavigator = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'navigator'
+  );
+  const copied = [],
+    shared = [];
+  try {
+    globalThis.window = { location: { origin: 'https://gatepoint.example' } };
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: {
+        clipboard: { writeText: async (value) => copied.push(value) },
+        share: async (value) => shared.push(value),
+      },
+    });
+    const { EventShare } = loadModule(
+      'src/features/events/components/event-share.tsx',
+      {
+        react: { useState: () => ['', () => {}] },
+        '@/components/ui/button': { Button: 'button' },
+        'next/link': { __esModule: true, default: 'a' },
+      }
+    );
+    const tree = EventShare({
+      slug: 'community-gathering',
+      title: 'Community gathering',
+    });
+    const nodes = [];
+    function walk(node) {
+      if (!node || typeof node !== 'object') return;
+      if (Array.isArray(node)) {
+        node.forEach(walk);
+        return;
+      }
+      nodes.push(node);
+      walk(node.props?.children);
+    }
+    walk(tree);
+    const buttons = nodes.filter((n) => n.type === 'button');
+    await buttons[0].props.onClick();
+    await buttons[1].props.onClick();
+    assert.deepEqual(copied, [
+      'https://gatepoint.example/public/events/community-gathering',
+    ]);
+    assert.deepEqual(shared, [
+      { title: 'Community gathering', url: copied[0] },
+    ]);
+    assert.equal(copied[0].includes('/events/private'), false);
+  } finally {
+    if (originalWindow === undefined) delete globalThis.window;
+    else globalThis.window = originalWindow;
+    if (originalNavigator)
+      Object.defineProperty(globalThis, 'navigator', originalNavigator);
+    else delete globalThis.navigator;
+  }
+});

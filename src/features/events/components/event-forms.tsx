@@ -151,6 +151,9 @@ function EventFields({
         </div>
         <div className="space-y-2">
           <Label htmlFor="endsAt">Ends at</Label>
+          <p className="text-xs text-muted-foreground">
+            The same date is fine. Choose an end time later than the start time.
+          </p>
           <Input
             id="endsAt"
             name="endsAt"
