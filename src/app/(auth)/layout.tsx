@@ -14,6 +14,7 @@ export default function AuthLayout({
           <Brand />
         </Link>
         <div className="auth-story-copy">
+          <p className="eyebrow">People first. Every detail connected.</p>
           <h1>
             A great gathering
             <br />
@@ -32,7 +33,7 @@ export default function AuthLayout({
             alt="A gathering at the United Nations conference hall in Addis Ababa"
             fill
             sizes="50vw"
-            priority
+            preload
           />
         </div>
         <div className="auth-story-footer">

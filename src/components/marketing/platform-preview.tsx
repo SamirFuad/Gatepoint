@@ -46,6 +46,7 @@ export function PlatformPreview() {
           className="feature-tabs"
           role="tablist"
           aria-label="Platform capabilities"
+          aria-orientation="vertical"
         >
           {views.map((item, i) => (
             <button
@@ -59,7 +60,14 @@ export function PlatformPreview() {
               onClick={() => setActive(i)}
               onKeyDown={(e) => {
                 if (
-                  ['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)
+                  [
+                    'ArrowDown',
+                    'ArrowUp',
+                    'ArrowRight',
+                    'ArrowLeft',
+                    'Home',
+                    'End',
+                  ].includes(e.key)
                 ) {
                   e.preventDefault();
                   const next =
@@ -68,7 +76,9 @@ export function PlatformPreview() {
                       : e.key === 'End'
                         ? views.length - 1
                         : (i +
-                            (e.key === 'ArrowRight' ? 1 : -1) +
+                            (e.key === 'ArrowRight' || e.key === 'ArrowDown'
+                              ? 1
+                              : -1) +
                             views.length) %
                           views.length;
                   setActive(next);
@@ -82,6 +92,7 @@ export function PlatformPreview() {
           ))}
         </div>
         <div
+          key={active}
           role="tabpanel"
           id={`feature-panel-${active}`}
           aria-labelledby={`feature-tab-${active}`}

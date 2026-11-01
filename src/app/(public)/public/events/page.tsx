@@ -12,6 +12,7 @@ export default async function PublicEventsPage() {
     <main className="site-container">
       <section className="discovery-heading">
         <div>
+          <p className="eyebrow">Discover / Connect / Belong</p>
           <h1>
             Find your people.
             <br />
@@ -31,7 +32,7 @@ export default async function PublicEventsPage() {
             src="/images/addis-ababa.jpg"
             alt="Aerial view of Addis Ababa, Ethiopia"
             fill
-            priority
+            preload
             sizes="(max-width: 650px) 100vw, 40vw"
           />
           <span>Your next connection starts here.</span>

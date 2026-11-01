@@ -178,15 +178,27 @@ export function DashboardShell({
           >
             <Menu size={19} />
           </button>
-          <div className="workspace-breadcrumb">
-            <span>Workspace</span>
+          <nav className="workspace-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/dashboard">Workspace</Link>
             {crumbs.map((crumb, i) => (
               <span key={i} className="inline-flex items-center gap-2">
                 {i === 0 ? <ChevronRight size={12} /> : <span>/</span>}
-                {crumb}
+                {i === crumbs.length - 1 ? (
+                  <span aria-current="page">{crumb}</span>
+                ) : (
+                  <Link
+                    href={
+                      segments[i] === 'organization'
+                        ? '/organization/settings'
+                        : '/' + segments.slice(0, i + 1).join('/')
+                    }
+                  >
+                    {crumb}
+                  </Link>
+                )}
               </span>
             ))}
-          </div>
+          </nav>
           <div className="workspace-header-actions">
             <AccountMenu />
             <Link href="/public/events">

@@ -77,6 +77,9 @@ export default function HomePage() {
     <div id="top" className="marketing-home">
       <section className="hero site-container">
         <div className="hero-copy">
+          <div className="eyebrow">
+            <span /> A better way to bring people together
+          </div>
           <h1>
             Great events.
             <br />
@@ -110,12 +113,17 @@ export default function HomePage() {
             src="/images/addis-conference.jpg"
             alt="Delegates in the United Nations conference hall in Addis Ababa, Ethiopia"
             fill
-            priority
+            preload
             sizes="(max-width: 800px) 100vw, 50vw"
             className="hero-photo"
           />
           <div className="hero-image-shade" />
           <span className="photo-caption">Make room for what matters.</span>
+          <div className="hero-visual-label" aria-hidden="true">
+            OPEN DOORS.
+            <br />
+            NEW POSSIBILITIES.
+          </div>
           <div className="hero-pass">
             <div className="pass-top">
               <span className="pass-icon">
@@ -168,11 +176,14 @@ export default function HomePage() {
         className="platform-section site-container section-space"
       >
         <div className="section-intro">
-          <h2>
-            Behind every great event,
-            <br />
-            <span>a little less busywork.</span>
-          </h2>
+          <div>
+            <p className="eyebrow">01 / Your platform</p>
+            <h2>
+              Behind every great event,
+              <br />
+              <span>a little less busywork.</span>
+            </h2>
+          </div>
           <p>
             A considered set of tools for everything that happens before the
             doors open. More clarity for your team. A better welcome for your
@@ -199,6 +210,7 @@ export default function HomePage() {
         <div className="site-container section-space">
           <div className="services-intro">
             <div>
+              <p className="eyebrow">02 / The complete experience</p>
               <h2>
                 Beyond the screen.
                 <br />
@@ -244,6 +256,7 @@ export default function HomePage() {
         className="workflow-section site-container section-space"
       >
         <div className="workflow-heading">
+          <p className="eyebrow">03 / A simple beginning</p>
           <h2>
             From “what if”
             <br />

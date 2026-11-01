@@ -9,6 +9,8 @@ import {
   CalendarDays,
   Compass,
   MapPin,
+  LayoutGrid,
+  List,
   Search,
   X,
 } from 'lucide-react';
@@ -29,15 +31,23 @@ type PublicEventSummary = Pick<
 export function EventExplorer({ events }: { events: PublicEventSummary[] }) {
   const [query, setQuery] = useState('');
   const [type, setType] = useState('all');
+  const [sort, setSort] = useState('soonest');
+  const [view, setView] = useState<'grid' | 'list'>('grid');
   const types = [...new Set(events.map((event) => event.eventType))];
-  const filtered = events.filter(
-    (event) =>
-      (type === 'all' || event.eventType === type) &&
-      [event.title, event.description, event.venueName]
-        .join(' ')
-        .toLowerCase()
-        .includes(query.trim().toLowerCase())
-  );
+  const filtered = events
+    .filter(
+      (event) =>
+        (type === 'all' || event.eventType === type) &&
+        [event.title, event.description, event.venueName]
+          .join(' ')
+          .toLowerCase()
+          .includes(query.trim().toLowerCase())
+    )
+    .sort((a, b) =>
+      sort === 'title'
+        ? a.title.localeCompare(b.title)
+        : new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+    );
   return (
     <div className="event-explorer">
       <div className="explorer-toolbar">
@@ -73,12 +83,58 @@ export function EventExplorer({ events }: { events: PublicEventSummary[] }) {
           </button>
         ))}
       </div>
-      <p className="explorer-count" role="status">
-        {filtered.length} {filtered.length === 1 ? 'event' : 'events'}
-        {query || type !== 'all' ? ' found' : ' to explore'}
-      </p>
+      <div className="explorer-results-bar">
+        <p className="explorer-count" role="status" aria-live="polite">
+          {filtered.length} {filtered.length === 1 ? 'event' : 'events'}
+          {query || type !== 'all' ? ' found' : ' to explore'}
+        </p>
+        <div className="explorer-view-controls">
+          {(query || type !== 'all') && (
+            <button
+              className="clear-filters"
+              type="button"
+              onClick={() => {
+                setQuery('');
+                setType('all');
+              }}
+            >
+              Clear filters <X size={14} />
+            </button>
+          )}
+          <label className="event-sort">
+            <span className="sr-only">Sort events</span>
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value)}
+            >
+              <option value="soonest">Soonest first</option>
+              <option value="title">Name A–Z</option>
+            </select>
+          </label>
+          <div className="view-switch" role="group" aria-label="Event layout">
+            <button
+              type="button"
+              aria-label="Grid view"
+              aria-pressed={view === 'grid'}
+              onClick={() => setView('grid')}
+            >
+              <LayoutGrid size={17} />
+            </button>
+            <button
+              type="button"
+              aria-label="List view"
+              aria-pressed={view === 'list'}
+              onClick={() => setView('list')}
+            >
+              <List size={17} />
+            </button>
+          </div>
+        </div>
+      </div>
       {filtered.length ? (
-        <div className="event-grid">
+        <div
+          className={'event-grid' + (view === 'list' ? ' event-list-view' : '')}
+        >
           {filtered.map((event) => {
             const date = new Date(event.startsAt);
             return (
@@ -97,7 +153,11 @@ export function EventExplorer({ events }: { events: PublicEventSummary[] }) {
                       src={event.coverImage.url}
                       alt={event.coverImage.alt || ''}
                       fill
-                      sizes="(max-width:650px) 100vw, 33vw"
+                      sizes={
+                        view === 'list'
+                          ? '(max-width:650px) 100vw, 240px'
+                          : '(max-width:650px) 100vw, (max-width:1100px) 50vw, 33vw'
+                      }
                       unoptimized={!event.coverImage.url.startsWith('/')}
                     />
                   )}

@@ -16,7 +16,12 @@ export default function MarketingLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <MarketingHeader />
-      <main className="flex-1">{children}</main>
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <main id="main-content" className="flex-1">
+        {children}
+      </main>
       <MarketingFooter />
     </div>
   );

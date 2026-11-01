@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryProvider, ToastProvider } from '@/components/providers';
 import './globals.css';
+import './window.css';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { createClient } from '@/lib/supabase/server';
 import { authProfile } from '@/features/auth/lib/auth-profile';

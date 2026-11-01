@@ -68,6 +68,18 @@ export function EventManager({ events }: { events: ManagedEvent[] }) {
         {filtered.length} {filtered.length === 1 ? 'event' : 'events'} in this
         view
       </p>
+      {(query || status !== 'all') && (
+        <button
+          type="button"
+          className="clear-filters mb-5"
+          onClick={() => {
+            setQuery('');
+            setStatus('all');
+          }}
+        >
+          Clear search and filters
+        </button>
+      )}
       {!filtered.length ? (
         <EmptyState
           icon={CalendarDays}
